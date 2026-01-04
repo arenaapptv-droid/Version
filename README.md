@@ -1,60 +1,55 @@
-# Arena TV 📺
+# Arena TV | أرينا تيفي 📺
 
-**Arena TV** is an Android application that provides a complete live TV streaming experience, offering access to thousands of global television channels, including sports, entertainment, and general content.
+**Arena TV** هو تطبيق أندرويد يوفّر تجربة مشاهدة متكاملة للبث التلفزيوني المباشر، حيث يتيح الوصول إلى آلاف القنوات العالمية، الرياضية، والترفيهية من مكان واحد.
 
-The app allows users to watch major matches, leagues, and official tournaments live directly on their Android devices, all in one place.
-
----
-
-## 🚀 Features
-
-- 📡 Access to thousands of live TV channels
-- ⚽ Live streaming of sports events, leagues, and official tournaments
-- 🕌 Islamic channels and Quran channels
-- 🎬 Entertainment, drama, and movie channels
-- 🌍 Multiple satellite support
-- ⚡ Powerful 24/7 streaming servers with minimal buffering
-- 📱 Fully compatible with all Android versions (old and new)
-- 🧩 Lightweight app with no special system requirements
-- 🔄 Regular updates with performance improvements and bug fixes
+يُمكّن التطبيق المستخدمين من متابعة المباريات، الدوريات، والبطولات الرسمية بشكل مباشر على أجهزة الأندرويد، مع أداء مستقر وتجربة استخدام سلسة.
 
 ---
 
-## 📱 Platform
+## ✨ المميزات
 
-- **Android only**
-- Designed to work smoothly on a wide range of devices
-
----
-
-## 🆓 Cost
-
-- Completely **free**
-- No paid subscriptions required
-
----
-
-## 🔧 Updates & Maintenance
-
-Arena TV is actively maintained and frequently updated to:
-- Improve streaming stability
-- Fix bugs from previous versions
-- Add new features and channels
-- Adapt to the needs of users in the Arab world
+- 📡 مشاهدة  القنوات التلفزيونية المباشرة
+- ⚽ بث مباشر للمباريات والدوريات والبطولات الرسمية
+- 🕌 قنوات إسلامية وقنوات القرآن الكريم
+- 🎬 قنوات ترفيهية، درامية، وأفلام
+- 🌍 دعم عدة أقمار صناعية
+- ⚡ سيرفرات بث قوية تعمل على مدار الساعة
+- 📱 متوافق مع جميع إصدارات أندرويد (القديمة والحديثة)
+- 🧩 تطبيق خفيف ولا يتطلب مواصفات تشغيل خاصة
+- 🔄 تحديثات مستمرة لتحسين الأداء ومعالجة الأخطاء
 
 ---
 
-## 📌 Disclaimer
+## 📱 المنصة المدعومة
 
-This project is intended for educational and demonstration purposes.  
-Channel availability and streaming quality depend on external sources.
-
----
-
-## 📬 Contact
-
-If you have suggestions, issues, or contributions, feel free to open an issue or submit a pull request.
+- **أندرويد فقط**
+- يعمل بسلاسة على مختلف أنواع الهواتف والأجهزة
 
 ---
 
-**Arena TV** – Watch. Enjoy. Anytime.
+## 🆓 التكلفة
+
+- التطبيق **مجاني بالكامل**
+- لا يتطلب اشتراكات مدفوعة
+
+---
+
+## 🔧 التحديثات والدعم
+
+يتم تطوير وصيانة تطبيق Arena TV بشكل مستمر بهدف:
+- تحسين استقرار البث وجودة المشاهدة
+- إصلاح الأخطاء البرمجية
+- إضافة مزايا وقنوات جديدة
+- تلبية احتياجات المستخدمين في العالم العربي
+
+---
+
+
+## 📬 المساهمة والتواصل
+
+في حال وجود ملاحظات، مشاكل، أو رغبة في المساهمة في تطوير المشروع، يمكن فتح Issue أو إرسال Pull Request عبر GitHub.
+
+---
+
+**Arena TV**  
+مشاهدة بلا تعقيد، في أي وقت.
