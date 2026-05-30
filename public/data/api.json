@@ -1,0 +1,16 @@
+{
+  "categories": [
+    { "id": 1, "name": "رياضة", "sort_order": 1 }
+  ],
+  "channels": [
+    {
+      "id": 1,
+      "name": "القناة الأولى",
+      "logo_url": "https://...",
+      "category_id": 1,
+      "is_active": true,
+      "servers": [1, 2],
+      "headers": []
+    }
+  ]
+}
