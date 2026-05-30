@@ -102,7 +102,6 @@
     <script>jwplayer.key = "XSuP4qMl+9tK17QNb+4+th2Pm9AWgMO/cYH8CI0HGGr7bdjo";</script>
 </head>
 <body>
-    <!-- Splash Screen -->
     <div class="splash-screen" id="splashScreen">
         <div class="splash-content">
             <img class="splash-logo" src="https://i.postimg.cc/zDj0NBJs/20260107-053334.png" alt="Rplay Logo">
@@ -110,14 +109,12 @@
         </div>
     </div>
 
-    <!-- Header -->
     <header>
         <div class="header-right"><button class="icon-btn" id="menuToggle"><span class="material-icons-round">menu</span></button></div>
         <div class="header-center"><img class="main-logo" src="https://i.postimg.cc/zDj0NBJs/20260107-053334.png" alt="Rplay Logo"></div>
         <div class="header-left"><button class="icon-btn" id="searchToggle"><span class="material-icons-round">search</span></button></div>
     </header>
 
-    <!-- Search Bar -->
     <div class="search-bar-container" id="searchBarContainer">
         <div class="search-bar">
             <input type="text" id="searchInput" placeholder="ابحث عن قناة...">
@@ -125,7 +122,6 @@
         </div>
     </div>
 
-    <!-- Menu Overlay -->
     <div class="menu-overlay" id="menuOverlay">
         <button class="menu-close" id="menuCloseBtn"><span class="material-icons-round">close</span></button>
         <div style="text-align:center; max-width:400px; width:100%;">
@@ -150,7 +146,6 @@
         </div>
     </div>
 
-    <!-- Player Container -->
     <div id="playerContainer">
         <div id="jwPlayerWrapper"></div>
         <div class="custom-controls" id="customControls">
@@ -160,24 +155,17 @@
         </div>
     </div>
 
-    <!-- Categories -->
     <nav class="categories" id="categoriesNav"></nav>
-
-    <!-- Channels Grid -->
     <section class="channels" id="channelsGrid"></section>
 
-    <!-- Footer -->
     <footer class="site-footer">
         جميع الحقوق محفوظة لـ <a href="https://rodoye.com" target="_blank">RodoTv</a>
     </footer>
 
-    <!-- Toast -->
     <div class="toast" id="toast"></div>
 
     <script>
-        // ============ الإعدادات ============
-        const API_BASE = 'https://a.rplay.rodoye.com'; // رابط Worker
-
+        const API_BASE = 'https://a.rplay.rodoye.com';
         let categories = [];
         let allChannels = [];
         let currentChannelId = null;
@@ -185,7 +173,6 @@
         const toast = document.getElementById('toast');
         let toastTimer;
 
-        // ============ تحميل البيانات من api.json ============
         async function loadData() {
             try {
                 const res = await fetch('data/api.json');
@@ -218,7 +205,6 @@
             setTimeout(() => document.getElementById('splashScreen').classList.add('hidden'), 2000);
         }
 
-        // ============ Toast ============
         function showToast(msg, icon='info') {
             clearTimeout(toastTimer);
             toast.innerHTML = `<span class="material-icons-round">${icon}</span> ${msg}`;
@@ -226,30 +212,14 @@
             toastTimer = setTimeout(() => toast.classList.remove('show'), 2000);
         }
 
-        // ============ جلب رابط البث من Worker ============
-        async function fetchStreamUrl(channel, serverIndex = 1) {
-            try {
-                const url = `${API_BASE}/get-stream?ch=${channel.id}&srv=${serverIndex}`;
-                const res = await fetch(url);
-                if (!res.ok) throw new Error('فشل جلب الرابط');
-                const data = await res.json();
-                return data.url;
-            } catch (err) {
-                showToast('لا يمكن تشغيل هذه القناة', 'error');
-                return null;
-            }
-        }
-
-        // ============ تشغيل القناة ============
         async function playChannel(channel) {
             const serverIndex = channel.servers?.[0] || 1;
-            const url = await fetchStreamUrl(channel, serverIndex);
-            if (!url) return;
+            const streamUrl = `${API_BASE}/proxy-stream?ch=${channel.id}&srv=${serverIndex}`;
 
             if (!jwPlayer) jwPlayer = jwplayer("jwPlayerWrapper");
 
             const cfg = {
-                file: url,
+                file: streamUrl,
                 type: 'hls',
                 width: '100%', height: '100%',
                 autostart: true, mute: false, volume: 100,
@@ -264,7 +234,6 @@
                 }
             };
 
-            // إضافة الهيدرات
             if (channel.headers?.length) {
                 cfg.hlsjs = {
                     onXhrOpen: function(xhr) {
@@ -299,7 +268,6 @@
             }
         }
 
-        // ============ عرض الواجهة ============
         function renderCategories() {
             const nav = document.getElementById('categoriesNav');
             const active = new URLSearchParams(window.location.search).get('category') || 'all';
@@ -338,7 +306,6 @@
             if (currentChannelId) updateActiveCard(currentChannelId);
         }
 
-        // ============ أزرار التحكم ============
         function updatePlayIcon(s) {
             document.querySelector('#playBtn .material-icons-round').textContent = s === 'pause' ? 'pause' : 'play_arrow';
         }
@@ -370,7 +337,6 @@
             }
         });
 
-        // ============ إخفاء تلقائي للأزرار ============
         let hideTimer;
         const ctrl = document.getElementById('customControls');
         function showControls() {
@@ -389,7 +355,6 @@
             }
         });
 
-        // ============ البحث ============
         const searchInput = document.getElementById('searchInput');
         document.getElementById('searchToggle').addEventListener('click', () => {
             document.getElementById('searchBarContainer').classList.add('active');
@@ -408,13 +373,11 @@
             });
         }
 
-        // ============ القائمة الجانبية ============
         const menu = document.getElementById('menuOverlay');
         document.getElementById('menuToggle').addEventListener('click', () => { menu.classList.add('active'); document.body.style.overflow = 'hidden'; });
         document.getElementById('menuCloseBtn').addEventListener('click', () => { menu.classList.remove('active'); document.body.style.overflow = ''; });
         menu.addEventListener('click', (e) => { if (e.target === menu) { menu.classList.remove('active'); document.body.style.overflow = ''; } });
 
-        // ============ النقر على بطاقة قناة ============
         document.addEventListener('click', e => {
             const card = e.target.closest('.channel-card');
             if (!card) return;
@@ -423,7 +386,6 @@
             if (channel) playChannel(channel);
         });
 
-        // ============ بدء التشغيل ============
         document.addEventListener('DOMContentLoaded', loadData);
     </script>
 </body>
