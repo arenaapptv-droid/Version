@@ -9,7 +9,7 @@
       "logo_url": "https://...",
       "category_id": 1,
       "is_active": true,
-      "servers": [1, 2],
+      "servers": [1],
       "headers": []
     }
   ]
