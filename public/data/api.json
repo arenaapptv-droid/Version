@@ -1,16 +1,29 @@
 {
   "categories": [
-    { "id": 1, "name": "رياضة", "sort_order": 1 }
+    { "id": 5, "name": "كأس العالم 2026", "sort_order": 5 }
   ],
   "channels": [
     {
       "id": 1,
-      "name": "القناة الأولى",
-      "logo_url": "https://...",
-      "category_id": 1,
+      "name": "Bein Max 1",
+      "logo_url": "https://i.postimg.cc/jqWGq8wp/20260518-185631.png",
+      "category_id": 5,
       "is_active": true,
+      "sort_order": 1,
       "servers": [1],
-      "headers": []
+      "headers": [],
+      "stream_url": "https://prod-fastly-eu-central-1.video.pscp.tv/Transcoding/v1/hls/Qn7Y00uqDKPXS8N0x_rbKFYM0igweXIqGVU7HFL4E66kAvspacW4yTkA51DlyfZPgQtXFxb0KCHooA50CiIwqw/non_transcode/eu-central-1/periscope-replay-direct-prod-eu-central-1-public/master_dynamic_highlatency.m3u8?type=live"
+    },
+    {
+      "id": 2,
+      "name": "Bein Max 2",
+      "logo_url": "https://i.postimg.cc/jqWGq8wp/20260518-185631.png",
+      "category_id": 5,
+      "is_active": true,
+      "sort_order": 2,
+      "servers": [1],
+      "headers": [],
+      "stream_url": "https://prod-fastly-eu-central-1.video.pscp.tv/Transcoding/v1/hls/zJj5EIrprdD-H3OtSIQ1FY-245E6F3ByOVsi8tStKeRJ2iVUf0SmBRzgsZMamSJX522ejQ5fyzvQB76WJiicQQ/non_transcode/eu-central-1/periscope-replay-direct-prod-eu-central-1-public/master_dynamic_highlatency.m3u8?type=live"
     }
   ]
 }
