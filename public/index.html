@@ -7,6 +7,7 @@
     <title>Rplay - البث المباشر</title>
     <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons+Round" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.2.1/css/all.min.css">
     <style>
         :root {
             --bg-primary: #030303; --bg-secondary: #0F1117; --bg-card: #161921; --bg-elevated: #1E2130;
@@ -38,10 +39,9 @@
         .menu-overlay { position:fixed; inset:0; background:rgba(3,3,3,0.95); backdrop-filter:blur(24px); z-index:2000; display:flex; align-items:center; justify-content:center; opacity:0; pointer-events:none; transition:opacity 0.4s; flex-direction:column; }
         .menu-overlay.active { opacity:1; pointer-events:auto; }
         .menu-close { position:absolute; top:24px; left:24px; background:rgba(255,255,255,0.1); border:none; border-radius:var(--radius); color:#fff; width:44px; height:44px; display:flex; align-items:center; justify-content:center; cursor:pointer; }
-        .menu-links { list-style:none; display:flex; flex-direction:column; gap:12px; margin-bottom:40px; }
-        .menu-links li a { display:flex; align-items:center; gap:10px; padding:16px 24px; border-radius:var(--radius); color:#fff; text-decoration:none; font-weight:700; font-size:18px; background:rgba(255,255,255,0.05); border:1px solid rgba(255,255,255,0.1); }
-        .social-links { display:flex; gap:16px; flex-wrap:wrap; justify-content:center; }
-        .social-link { display:flex; align-items:center; gap:8px; background:rgba(255,255,255,0.06); border:1px solid rgba(255,255,255,0.1); padding:12px 20px; border-radius:var(--radius-full); color:#fff; text-decoration:none; font-weight:600; }
+        .social-links { display:flex; gap:16px; flex-wrap:wrap; justify-content:center; margin-top:30px; }
+        .social-link { display:flex; align-items:center; justify-content:center; width:44px; height:44px; border-radius:50%; background:rgba(255,255,255,0.06); border:1px solid rgba(255,255,255,0.1); color:#fff; text-decoration:none; font-size:20px; transition:background 0.2s; }
+        .social-link:hover { background:var(--accent-primary); }
         .app-section { margin-top:30px; text-align:center; }
         .app-logo { width:70px; height:70px; border-radius:16px; margin-bottom:10px; object-fit:contain; background:#1E2130; padding:8px; }
         .app-title { font-size:16px; font-weight:700; margin-bottom:6px; }
@@ -50,6 +50,8 @@
         .download-btn:hover { opacity:0.9; }
         #playerContainer { width:100%; aspect-ratio:16/9; max-height:70vh; background:#000; position:relative; overflow:hidden; border-radius:0; border-bottom:1px solid rgba(255,255,255,0.15); }
         #jwPlayerWrapper { width:100%; height:100%; }
+        #loadingSpinner { position:absolute; top:50%; left:50%; transform:translate(-50%,-50%); width:48px; height:48px; border:4px solid rgba(255,255,255,0.2); border-top-color:#D90C11; border-radius:50%; animation:spin 0.8s linear infinite; z-index:30; display:none; }
+        #loadingSpinner.show { display:block; }
         .custom-controls { position:absolute; bottom:16px; left:50%; transform:translateX(-50%); z-index:20; display:flex; gap:10px; padding:8px 12px; background:rgba(0,0,0,0.65); backdrop-filter:blur(16px); border-radius:var(--radius-full); border:1px solid rgba(255,255,255,0.15); opacity:1; transition:opacity 0.3s; pointer-events:auto; }
         .custom-controls.hidden { opacity:0; pointer-events:none; }
         .ctrl-btn { width:35px; height:35px; border:none; border-radius:50%; background:rgba(255,255,255,0.1); color:#fff; display:flex; align-items:center; justify-content:center; cursor:pointer; transition:background 0.2s; backdrop-filter:blur(8px); padding:0; }
@@ -60,8 +62,8 @@
         .category { padding:10px 20px; border-radius:var(--radius); background:var(--bg-card); color:var(--text-secondary); font-size:14px; font-weight:600; white-space:nowrap; cursor:pointer; border:1px solid transparent; }
         .category.active { background:var(--accent-primary); color:#fff; }
         .channels { padding:8px 12px 30px; display:grid; grid-template-columns:repeat(2,1fr); gap:10px; }
-        .channel-card { position:relative; border-radius:var(--radius); overflow:hidden; background:var(--bg-card); cursor:pointer; box-shadow:0 4px 12px rgba(0,0,0,0.4); aspect-ratio:20/13; }
-        .channel-card:hover { transform:translateY(-4px); }
+        .channel-card { position:relative; border-radius:var(--radius); overflow:hidden; background:var(--bg-card); cursor:pointer; box-shadow:0 4px 12px rgba(0,0,0,0.4); aspect-ratio:20/13; transition:box-shadow 0.2s, border-color 0.2s; border:1px solid transparent; }
+        .channel-card:hover { box-shadow:0 8px 20px rgba(0,0,0,0.6); border-color:var(--accent-primary); }
         .channel-image { width:100%; height:100%; object-fit:cover; }
         .channel-gradient { position:absolute; inset:0; background:linear-gradient(to top, rgba(0,0,0,0.8), transparent); }
         .channel-title { position:absolute; bottom:12px; left:12px; right:12px; text-align:center; font-size:14px; font-weight:700; }
@@ -75,6 +77,7 @@
         @keyframes fadeInUp { from{opacity:0;transform:translateY(20px);} to{opacity:1;transform:translateY(0);} }
         @keyframes pulse { 0%,100%{opacity:1;} 50%{opacity:0.6;} }
         @keyframes loading { 0%{transform:translateX(-100%);} 100%{transform:translateX(350%);} }
+        @keyframes spin { to{transform:translate(-50%,-50%) rotate(360deg);} }
         @media(min-width:768px) { .channels { grid-template-columns:repeat(4,1fr); gap:14px; padding:12px 28px 40px; } }
     </style>
     <script src="//ssl.p.jwpcdn.com/player/v/8.26.0/jwplayer.js"></script>
@@ -101,15 +104,10 @@
     <div class="menu-overlay" id="menuOverlay">
         <button class="menu-close" id="menuCloseBtn"><span class="material-icons-round">close</span></button>
         <div style="text-align:center; max-width:400px; width:100%;">
-            <ul class="menu-links">
-                <li><a href="index.html"><span class="material-icons-round">home</span> الرئيسية</a></li>
-                <li><a href="#"><span class="material-icons-round">privacy_tip</span> سياسة الخصوصية</a></li>
-                <li><a href="#"><span class="material-icons-round">mail</span> اتصل بنا</a></li>
-            </ul>
             <div class="social-links">
-                <a href="https://t.me/rodo_tv" target="_blank" class="social-link"><span class="material-icons-round">send</span> تيليجرام</a>
-                <a href="https://www.tiktok.com/@rodo_tv_live" target="_blank" class="social-link"><span class="material-icons-round">music_note</span> تيك توك</a>
-                <a href="https://www.instagram.com/rodo_tv_live" target="_blank" class="social-link"><span class="material-icons-round">camera</span> انستغرام</a>
+                <a href="https://t.me/rodo_tv" target="_blank" class="social-link"><i class="fa-brands fa-telegram"></i></a>
+                <a href="https://www.tiktok.com/@rodo_tv_live" target="_blank" class="social-link"><i class="fa-brands fa-tiktok"></i></a>
+                <a href="https://www.instagram.com/rodo_tv_live" target="_blank" class="social-link"><i class="fa-brands fa-instagram"></i></a>
             </div>
             <div class="app-section">
                 <img class="app-logo" src="https://i.postimg.cc/CMJv13vB/20260405-203316.png" alt="RodoTv Logo">
@@ -123,6 +121,7 @@
     </div>
     <div id="playerContainer">
         <div id="jwPlayerWrapper"></div>
+        <div id="loadingSpinner" class="show"></div>
         <div class="custom-controls" id="customControls">
             <button class="ctrl-btn play-btn" id="playBtn"><span class="material-icons-round">play_arrow</span></button>
             <button class="ctrl-btn" id="muteBtn"><span class="material-icons-round">volume_up</span></button>
@@ -142,6 +141,8 @@
         let jwPlayer = null;
         const toast = document.getElementById('toast');
         let toastTimer;
+        const loadingSpinner = document.getElementById('loadingSpinner');
+
         async function loadData() {
             try {
                 const res = await fetch('data/api.json');
@@ -182,6 +183,7 @@
             }
             const url = channel.stream_url;
             if (!jwPlayer) jwPlayer = jwplayer("jwPlayerWrapper");
+            loadingSpinner.classList.add('show');
             const cfg = {
                 file: url,
                 type: 'hls',
@@ -190,25 +192,16 @@
                 stretching: 'uniform', controls: false,
                 playbackRateControls: true,
                 playbackRates: [0.5, 1, 1.25, 1.5, 2],
-                drm: {
-                    clearkey: {
-                        keyId: "b253c726c24c7c94a3ddf9b1907e2c76",
-                        key: "097963d6ad73c3d712a104981de0ed42"
-                    }
-                }
+                drm: { clearkey: { keyId: "b253c726c24c7c94a3ddf9b1907e2c76", key: "097963d6ad73c3d712a104981de0ed42" } }
             };
             if (channel.headers?.length) {
-                cfg.hlsjs = {
-                    onXhrOpen: function(xhr) {
-                        channel.headers.forEach(h => xhr.setRequestHeader(h.key, h.value));
-                    }
-                };
+                cfg.hlsjs = { onXhrOpen: function(xhr) { channel.headers.forEach(h => xhr.setRequestHeader(h.key, h.value)); } };
             }
             jwPlayer.setup(cfg);
-            jwPlayer.on('play', () => { jwPlayer.setMute(false); jwPlayer.setVolume(100); updatePlayIcon('pause'); });
+            jwPlayer.on('play', () => { jwPlayer.setMute(false); jwPlayer.setVolume(100); updatePlayIcon('pause'); loadingSpinner.classList.remove('show'); });
             jwPlayer.on('pause', () => updatePlayIcon('play'));
-            jwPlayer.on('ready', () => { updatePlayIcon('pause'); jwPlayer.setMute(false); });
-            jwPlayer.on('error', e => { console.error(e); showToast('تعذر تشغيل البث', 'error_outline'); });
+            jwPlayer.on('ready', () => { updatePlayIcon('pause'); jwPlayer.setMute(false); loadingSpinner.classList.remove('show'); });
+            jwPlayer.on('error', e => { console.error(e); showToast('تعذر تشغيل البث', 'error_outline'); loadingSpinner.classList.remove('show'); });
             updatePlayIcon('pause');
             currentChannelId = channel.id;
             updateActiveCard(channel.id);
@@ -243,7 +236,6 @@
                     const filtered = id === 'all' ? allChannels : allChannels.filter(ch => ch.category_id == id);
                     renderChannels(filtered);
                     history.pushState({}, '', id === 'all' ? 'index.html' : `?category=${id}`);
-                    if (filtered.length > 0) playChannel(filtered[0]);
                 });
             });
         }
@@ -273,52 +265,28 @@
             document.querySelector('#fullscreenBtn .material-icons-round').textContent = f ? 'fullscreen_exit' : 'fullscreen';
         }
         document.getElementById('playBtn').addEventListener('click', () => {
-            if (jwPlayer) {
-                const s = jwPlayer.getState();
-                s === 'playing' ? jwPlayer.pause(true) : jwPlayer.play(true);
-            }
+            if (jwPlayer) { const s = jwPlayer.getState(); s === 'playing' ? jwPlayer.pause(true) : jwPlayer.play(true); }
         });
         document.getElementById('muteBtn').addEventListener('click', () => {
-            if (jwPlayer) {
-                const m = !jwPlayer.getMute();
-                jwPlayer.setMute(m);
-                updateMuteIcon(m);
-            }
+            if (jwPlayer) { const m = !jwPlayer.getMute(); jwPlayer.setMute(m); updateMuteIcon(m); }
         });
         document.getElementById('fullscreenBtn').addEventListener('click', () => {
-            if (jwPlayer) {
-                const f = !jwPlayer.getFullscreen();
-                jwPlayer.setFullscreen(f);
-                updateFullscreenIcon(f);
-            }
+            if (jwPlayer) { const f = !jwPlayer.getFullscreen(); jwPlayer.setFullscreen(f); updateFullscreenIcon(f); }
         });
         let hideTimer;
         const ctrl = document.getElementById('customControls');
         function showControls() {
             ctrl.classList.remove('hidden');
             clearTimeout(hideTimer);
-            if (jwPlayer && jwPlayer.getState() === 'playing') {
-                hideTimer = setTimeout(() => ctrl.classList.add('hidden'), 3000);
-            }
+            if (jwPlayer && jwPlayer.getState() === 'playing') hideTimer = setTimeout(() => ctrl.classList.add('hidden'), 3000);
         }
         document.getElementById('playerContainer').addEventListener('mousemove', showControls);
         document.getElementById('playerContainer').addEventListener('touchstart', showControls);
         ctrl.addEventListener('mouseenter', () => clearTimeout(hideTimer));
-        ctrl.addEventListener('mouseleave', () => {
-            if (jwPlayer && jwPlayer.getState() === 'playing') {
-                hideTimer = setTimeout(() => ctrl.classList.add('hidden'), 1500);
-            }
-        });
+        ctrl.addEventListener('mouseleave', () => { if (jwPlayer && jwPlayer.getState() === 'playing') hideTimer = setTimeout(() => ctrl.classList.add('hidden'), 1500); });
         const searchInput = document.getElementById('searchInput');
-        document.getElementById('searchToggle').addEventListener('click', () => {
-            document.getElementById('searchBarContainer').classList.add('active');
-            searchInput.focus();
-        });
-        document.getElementById('closeSearchBtn').addEventListener('click', () => {
-            document.getElementById('searchBarContainer').classList.remove('active');
-            searchInput.value = '';
-            filterChannelsByName('');
-        });
+        document.getElementById('searchToggle').addEventListener('click', () => { document.getElementById('searchBarContainer').classList.add('active'); searchInput.focus(); });
+        document.getElementById('closeSearchBtn').addEventListener('click', () => { document.getElementById('searchBarContainer').classList.remove('active'); searchInput.value = ''; filterChannelsByName(''); });
         searchInput.addEventListener('input', e => filterChannelsByName(e.target.value));
         function filterChannelsByName(term) {
             document.querySelectorAll('.channel-card').forEach(card => {
