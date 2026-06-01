@@ -58,8 +58,6 @@
         .ctrl-btn:hover { background:rgba(255,255,255,0.25); }
         .ctrl-btn.play-btn { background:var(--accent-primary); }
         .ctrl-btn .material-icons-round { font-size:20px; }
-        .ad-banner-container { display:flex; justify-content:center; margin:12px 0; }
-        .ad-banner-container iframe { border:none; }
         .categories { display:flex; gap:8px; overflow-x:auto; padding:20px 16px 8px; }
         .category { padding:10px 20px; border-radius:var(--radius); background:var(--bg-card); color:var(--text-secondary); font-size:14px; font-weight:600; white-space:nowrap; cursor:pointer; border:1px solid transparent; }
         .category.active { background:var(--accent-primary); color:#fff; }
@@ -84,6 +82,8 @@
     </style>
     <script src="//ssl.p.jwpcdn.com/player/v/8.26.0/jwplayer.js"></script>
     <script>jwplayer.key = "XSuP4qMl+9tK17QNb+4+th2Pm9AWgMO/cYH8CI0HGGr7bdjo";</script>
+    <!-- إعلان قبل نهاية الهيد -->
+    <script src="https://pl29613827.effectivecpmnetwork.com/b1/86/1d/b1861d6fc09ea3e59547e20d87ffe670.js"></script>
 </head>
 <body>
     <div class="splash-screen" id="splashScreen">
@@ -130,21 +130,6 @@
             <button class="ctrl-btn" id="fullscreenBtn"><span class="material-icons-round">fullscreen</span></button>
         </div>
     </div>
-
-    <!-- إعلان بانر -->
-    <div class="ad-banner-container">
-        <script>
-            atOptions = {
-                'key' : '06aa39c96f7ea1dbec8b5ee06a8329a6',
-                'format' : 'iframe',
-                'height' : 300,
-                'width' : 160,
-                'params' : {}
-            };
-        </script>
-        <script src="https://www.highperformanceformat.com/06aa39c96f7ea1dbec8b5ee06a8329a6/invoke.js"></script>
-    </div>
-
     <nav class="categories" id="categoriesNav"></nav>
     <section class="channels" id="channelsGrid"></section>
     <footer class="site-footer">
@@ -311,5 +296,17 @@
         });
         document.addEventListener('DOMContentLoaded', loadData);
     </script>
+
+    <!-- إعلانات أسفل الصفحة -->
+    <script>
+        atOptions = {
+            'key' : '393e2ad22a4522cd9dbf33df7c029bf2',
+            'format' : 'iframe',
+            'height' : 250,
+            'width' : 300,
+            'params' : {}
+        };
+    </script>
+    <script src="https://www.highperformanceformat.com/393e2ad22a4522cd9dbf33df7c029bf2/invoke.js"></script>
 </body>
 </html>
