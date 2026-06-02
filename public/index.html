@@ -273,17 +273,28 @@
         function updateMuteIcon(m) { document.querySelector('#muteBtn .material-icons-round').textContent = m ? 'volume_off' : 'volume_up'; }
         function updateFullscreenIcon(f) { document.querySelector('#fullscreenBtn .material-icons-round').textContent = f ? 'fullscreen_exit' : 'fullscreen'; }
 
-        // زر ملء الشاشة الصحيح
+        // زر ملء الشاشة مع قفل الاتجاه الأفقي
         const playerContainer = document.getElementById('playerContainer');
         document.getElementById('fullscreenBtn').addEventListener('click', () => {
             if (!document.fullscreenElement) {
-                playerContainer.requestFullscreen().catch(() => showToast('تعذر ملء الشاشة', 'error'));
+                playerContainer.requestFullscreen().then(() => {
+                    if (screen.orientation && screen.orientation.lock) {
+                        screen.orientation.lock('landscape').catch(() => {});
+                    }
+                }).catch(() => showToast('تعذر ملء الشاشة', 'error'));
             } else {
-                document.exitFullscreen();
+                document.exitFullscreen().then(() => {
+                    if (screen.orientation && screen.orientation.unlock) {
+                        screen.orientation.unlock();
+                    }
+                });
             }
         });
         document.addEventListener('fullscreenchange', () => {
             updateFullscreenIcon(!!document.fullscreenElement);
+            if (!document.fullscreenElement && screen.orientation && screen.orientation.unlock) {
+                screen.orientation.unlock();
+            }
         });
 
         document.getElementById('playBtn').addEventListener('click', () => {
