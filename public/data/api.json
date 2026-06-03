@@ -12,11 +12,22 @@
       "sort_order": 1,
       "servers": [1],
       "headers": [],
+      "stream_url": "https://prod-fastly-eu-central-1.video.pscp.tv/Transcoding/v1/hls/s6luPomOaAkAg_2uzTxbcpYffgRUrVC4Ag1942oTxRMtaO7lsXhquwD_zDuFYMuf83BTyuRirJ-gNgx6Sotbxw/non_transcode/eu-central-1/periscope-replay-direct-prod-eu-central-1-public/master_dynamic_highlatency.m3u8?type=live"
+    },
+    {
+      "id": 1,
+      "name": "BLUE SPORT 2",
+      "logo_url": "https://i.postimg.cc/dVNxgBLJ/20260603-150404.png",
+      "category_id": 5,
+      "is_active": true,
+      "sort_order": 1,
+      "servers": [1],
+      "headers": [],
       "stream_url": "https://prod-fastly-eu-west-1.video.pscp.tv/Transcoding/v1/hls/d3Zz7G6_1ObTWzu7X1S1AJr-cUJA72NOOkWS94sZ106ChYQPT4TXRWRTYeICIr-zouudPEkPDi7aIIt1wsB--g/non_transcode/eu-west-1/periscope-replay-direct-prod-eu-west-1-public/master_dynamic_delta.m3u8?type=live"
     },
     {
       "id": 2,
-      "name": "BLUE SPORT 2",
+      "name": "BLUE SPORT 3",
       "logo_url": "https://i.postimg.cc/dVNxgBLJ/20260603-150404.png",
       "category_id": 5,
       "is_active": true,
