@@ -12,7 +12,7 @@
       "sort_order": 1,
       "servers": [1],
       "headers": [],
-      "stream_url": "https://match-now.site/live/blue_sport_1/index.m3u8"
+      "stream_url": "https://prod-fastly-eu-west-1.video.pscp.tv/Transcoding/v1/hls/d3Zz7G6_1ObTWzu7X1S1AJr-cUJA72NOOkWS94sZ106ChYQPT4TXRWRTYeICIr-zouudPEkPDi7aIIt1wsB--g/non_transcode/eu-west-1/periscope-replay-direct-prod-eu-west-1-public/master_dynamic_delta.m3u8?type=live"
     },
     {
       "id": 2,
@@ -23,7 +23,7 @@
       "sort_order": 2,
       "servers": [1],
       "headers": [],
-      "stream_url": "https://match-now.site/live/blue_sport_2/index.m3u8"
+      "stream_url": "https://prod-fastly-eu-west-3.video.pscp.tv/Transcoding/v1/hls/BfPgceLmYusT1XdSlOrcRW5cN8eoev-P2rqyqSzpQuFsHHrGu-BfglYWWX4NAZ0j5md-bshYdemhFXiFc7f2Yg/non_transcode/eu-west-3/periscope-replay-direct-prod-eu-west-3-public/master_dynamic_highlatency.m3u8?type=live"
     }
   ]
 }
