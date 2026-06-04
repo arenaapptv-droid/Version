@@ -1,6 +1,8 @@
 {
   "categories": [
-    { "id": 5, "name": "كأس العالم 2026", "sort_order": 5 }
+    
+    { "id": 5, "name": "قنوات Blue Sports", "sort_order": 5 },
+    { "id": 6, "name": "قنوات Alwan Sport", "sort_order": 6 }
   ],
   "channels": [
     {
@@ -15,26 +17,103 @@
       "stream_url": "https://prod-fastly-eu-central-1.video.pscp.tv/Transcoding/v1/hls/s6luPomOaAkAg_2uzTxbcpYffgRUrVC4Ag1942oTxRMtaO7lsXhquwD_zDuFYMuf83BTyuRirJ-gNgx6Sotbxw/non_transcode/eu-central-1/periscope-replay-direct-prod-eu-central-1-public/master_dynamic_highlatency.m3u8?type=live"
     },
     {
-      "id": 1,
-      "name": "BLUE SPORT 2",
-      "logo_url": "https://i.postimg.cc/dVNxgBLJ/20260603-150404.png",
-      "category_id": 5,
-      "is_active": true,
-      "sort_order": 1,
-      "servers": [1],
-      "headers": [],
-      "stream_url": "https://prod-fastly-eu-west-1.video.pscp.tv/Transcoding/v1/hls/d3Zz7G6_1ObTWzu7X1S1AJr-cUJA72NOOkWS94sZ106ChYQPT4TXRWRTYeICIr-zouudPEkPDi7aIIt1wsB--g/non_transcode/eu-west-1/periscope-replay-direct-prod-eu-west-1-public/master_dynamic_delta.m3u8?type=live"
-    },
-    {
       "id": 2,
-      "name": "BLUE SPORT 3",
+      "name": "BLUE SPORT 2",
       "logo_url": "https://i.postimg.cc/dVNxgBLJ/20260603-150404.png",
       "category_id": 5,
       "is_active": true,
       "sort_order": 2,
       "servers": [1],
       "headers": [],
+      "stream_url": "https://prod-fastly-eu-west-1.video.pscp.tv/Transcoding/v1/hls/d3Zz7G6_1ObTWzu7X1S1AJr-cUJA72NOOkWS94sZ106ChYQPT4TXRWRTYeICIr-zouudPEkPDi7aIIt1wsB--g/non_transcode/eu-west-1/periscope-replay-direct-prod-eu-west-1-public/master_dynamic_delta.m3u8?type=live"
+    },
+    {
+      "id": 3,
+      "name": "BLUE SPORT 3",
+      "logo_url": "https://i.postimg.cc/dVNxgBLJ/20260603-150404.png",
+      "category_id": 5,
+      "is_active": true,
+      "sort_order": 3,
+      "servers": [1],
+      "headers": [],
       "stream_url": "https://prod-fastly-eu-west-3.video.pscp.tv/Transcoding/v1/hls/BfPgceLmYusT1XdSlOrcRW5cN8eoev-P2rqyqSzpQuFsHHrGu-BfglYWWX4NAZ0j5md-bshYdemhFXiFc7f2Yg/non_transcode/eu-west-3/periscope-replay-direct-prod-eu-west-3-public/master_dynamic_highlatency.m3u8?type=live"
+    },
+    {
+      "id": 4,
+      "name": "Alwan Sport 1",
+      "logo_url": "https://i.postimg.cc/zXRdfD76/20260423-201922.png",
+      "category_id": 6,
+      "is_active": true,
+      "sort_order": 1,
+      "servers": [1],
+      "headers": [],
+      "stream_url": "https://stream.camcloud.stream/stream/0d1208654682/playlist.m3u8"
+    },
+    {
+      "id": 5,
+      "name": "Alwan Sport 2",
+      "logo_url": "https://i.postimg.cc/zXRdfD76/20260423-201922.png",
+      "category_id": 6,
+      "is_active": true,
+      "sort_order": 2,
+      "servers": [1],
+      "headers": [],
+      "stream_url": "https://stream.camcloud.stream/stream/8dd8ad49bb05/playlist.m3u8"
+    },
+    {
+      "id": 6,
+      "name": "Alwan Sport 3",
+      "logo_url": "https://i.postimg.cc/zXRdfD76/20260423-201922.png",
+      "category_id": 6,
+      "is_active": true,
+      "sort_order": 3,
+      "servers": [1],
+      "headers": [],
+      "stream_url": "https://stream.camcloud.stream/stream/075f2d3a2988/playlist.m3u8"
+    },
+    {
+      "id": 7,
+      "name": "Alwan Sport 4",
+      "logo_url": "https://i.postimg.cc/zXRdfD76/20260423-201922.png",
+      "category_id": 6,
+      "is_active": true,
+      "sort_order": 4,
+      "servers": [1],
+      "headers": [],
+      "stream_url": "https://stream.camcloud.stream/stream/4994d2defc1a/playlist.m3u8"
+    },
+    {
+      "id": 8,
+      "name": "Alwan Sport 5",
+      "logo_url": "https://i.postimg.cc/zXRdfD76/20260423-201922.png",
+      "category_id": 6,
+      "is_active": true,
+      "sort_order": 5,
+      "servers": [1],
+      "headers": [],
+      "stream_url": "https://stream.camcloud.stream/stream/6478d42a682b/playlist.m3u8"
+    },
+    {
+      "id": 9,
+      "name": "Alwan Sport 6",
+      "logo_url": "https://i.postimg.cc/zXRdfD76/20260423-201922.png",
+      "category_id": 6,
+      "is_active": true,
+      "sort_order": 6,
+      "servers": [1],
+      "headers": [],
+      "stream_url": "https://stream.camcloud.stream/stream/4daee3f6e9e7/playlist.m3u8"
+    },
+    {
+      "id": 10,
+      "name": "Alwan Sport 7",
+      "logo_url": "https://i.postimg.cc/zXRdfD76/20260423-201922.png",
+      "category_id": 6,
+      "is_active": true,
+      "sort_order": 7,
+      "servers": [1],
+      "headers": [],
+      "stream_url": "https://stream.camcloud.stream/stream/c28b01f8c96e/playlist.m3u8"
     }
   ]
 }
