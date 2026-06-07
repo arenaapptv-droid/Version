@@ -53,7 +53,6 @@
             border-radius: 4px;
         }
 
-        /* ========== HEADER ========== */
         header {
             height: 64px;
             padding: 0 20px;
@@ -120,7 +119,6 @@
             font-size: 22px;
         }
 
-        /* ========== القائمة الجانبية ========== */
         .menu-overlay {
             position: fixed;
             inset: 0;
@@ -202,7 +200,6 @@
             color: #fff;
         }
 
-        /* ========== بانر إعلاني 16:9 ========== */
         .ad-container {
             position: relative;
             width: 100%;
@@ -260,7 +257,6 @@
             box-shadow: 0 0 8px rgba(0,85,239,0.6);
         }
 
-        /* ========== القنوات الرياضية ========== */
         .section-header {
             padding: 28px 20px 16px;
             display: flex;
@@ -339,7 +335,148 @@
             text-shadow: 0 2px 6px rgba(0, 0, 0, 0.7);
         }
 
-        /* ========== TOAST ========== */
+        /* مشغل الفيديو */
+        .player-overlay {
+            position: fixed;
+            inset: 0;
+            background: #000;
+            z-index: 3000;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.3s;
+        }
+        .player-overlay.active {
+            opacity: 1;
+            pointer-events: auto;
+        }
+        .player-wrapper {
+            width: 100%;
+            height: 100%;
+            position: relative;
+            background: #000;
+        }
+        #jwPlayerWrapper {
+            width: 100%;
+            height: 100%;
+        }
+        .player-loading {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 48px;
+            height: 48px;
+            border: 4px solid rgba(255,255,255,0.2);
+            border-top-color: var(--accent-primary);
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+            z-index: 30;
+            display: none;
+        }
+        .player-loading.show {
+            display: block;
+        }
+        @keyframes spin {
+            to { transform: translate(-50%, -50%) rotate(360deg); }
+        }
+        .player-controls {
+            position: absolute;
+            bottom: 24px;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 20;
+            display: flex;
+            gap: 10px;
+            padding: 8px 12px;
+            background: rgba(0, 0, 0, 0.65);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border-radius: 40px;
+            border: 1px solid rgba(255,255,255,0.15);
+        }
+        .ctrl-btn {
+            width: 40px;
+            height: 40px;
+            border: none;
+            border-radius: 50%;
+            background: rgba(255,255,255,0.1);
+            color: #fff;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: background 0.2s;
+            backdrop-filter: blur(8px);
+            padding: 0;
+        }
+        .ctrl-btn:hover {
+            background: rgba(255,255,255,0.25);
+        }
+        .ctrl-btn.play-btn {
+            background: var(--accent-primary);
+        }
+        .ctrl-btn .material-icons-round {
+            font-size: 22px;
+        }
+        .quality-popup {
+            position: absolute;
+            bottom: 80px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(0,0,0,0.85);
+            backdrop-filter: blur(16px);
+            border-radius: var(--radius);
+            border: 1px solid rgba(255,255,255,0.15);
+            padding: 8px 0;
+            min-width: 120px;
+            z-index: 25;
+            display: none;
+            flex-direction: column;
+        }
+        .quality-popup.active {
+            display: flex;
+        }
+        .quality-item {
+            padding: 10px 20px;
+            color: #fff;
+            cursor: pointer;
+            font-size: 14px;
+            text-align: center;
+            white-space: nowrap;
+            transition: background 0.2s;
+        }
+        .quality-item:hover {
+            background: rgba(255,255,255,0.1);
+        }
+        .quality-item.active {
+            color: var(--accent-primary);
+            font-weight: bold;
+        }
+        .player-close-btn {
+            position: absolute;
+            top: 24px;
+            right: 24px;
+            z-index: 40;
+            background: rgba(0,0,0,0.6);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255,255,255,0.2);
+            color: #fff;
+            width: 44px;
+            height: 44px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+        .player-close-btn:hover {
+            background: rgba(255,255,255,0.2);
+        }
+
         .toast-container {
             position: fixed;
             bottom: 30px;
@@ -371,7 +508,6 @@
             transform: translateY(0);
         }
 
-        /* ========== FOOTER ========== */
         .site-footer {
             padding: 20px 16px;
             text-align: center;
@@ -391,7 +527,6 @@
             text-decoration: underline;
         }
 
-        /* استجابة */
         @media (min-width: 768px) {
             .channels-grid {
                 grid-template-columns: repeat(4, 1fr);
@@ -414,6 +549,8 @@
             }
         }
     </style>
+    <script src="//ssl.p.jwpcdn.com/player/v/8.26.0/jwplayer.js"></script>
+    <script>jwplayer.key = "XSuP4qMl+9tK17QNb+4+th2Pm9AWgMO/cYH8CI0HGGr7bdjo";</script>
 </head>
 <body>
 
@@ -441,9 +578,7 @@
     </div>
 
     <div class="ad-container">
-        <div class="ad-aspect" id="adBanner">
-            <!-- الشرائح تضاف هنا -->
-        </div>
+        <div class="ad-aspect" id="adBanner"></div>
         <div class="ad-dots" id="adDots"></div>
     </div>
 
@@ -454,6 +589,24 @@
 
     <div class="channels-grid" id="channelsGrid"></div>
 
+    <!-- مشغل الفيديو -->
+    <div class="player-overlay" id="playerOverlay">
+        <button class="player-close-btn" id="playerCloseBtn">
+            <span class="material-icons-round">close</span>
+        </button>
+        <div class="player-wrapper">
+            <div id="jwPlayerWrapper"></div>
+            <div class="player-loading" id="playerLoading"></div>
+            <div class="player-controls" id="playerControls">
+                <button class="ctrl-btn play-btn" id="playBtn"><span class="material-icons-round">play_arrow</span></button>
+                <button class="ctrl-btn" id="muteBtn"><span class="material-icons-round">volume_up</span></button>
+                <button class="ctrl-btn" id="qualityBtn"><span class="material-icons-round">high_quality</span></button>
+                <button class="ctrl-btn" id="aspectRatioBtn" title="تغيير وضع العرض"><span class="material-icons-round">aspect_ratio</span></button>
+            </div>
+            <div class="quality-popup" id="qualityPopup"></div>
+        </div>
+    </div>
+
     <div class="toast-container" id="toastContainer">
         <div class="toast" id="toast"></div>
     </div>
@@ -463,7 +616,6 @@
     </footer>
 
     <script>
-        // ============ الإعلانات ============
         const ads = [
             { image: 'https://i.postimg.cc/kGmCkdn1/20260607-170253.png', color: '#0f172a', text: 'إعلان 1' },
             { image: 'https://i.postimg.cc/dVNxgBLJ/20260603-150404.png', color: '#1a1a2e', text: 'إعلان 2' },
@@ -476,7 +628,6 @@
         const adDuration = 5000;
 
         function createAdSlides() {
-            // إزالة الشرائح القديمة إن وجدت
             adBanner.querySelectorAll('.ad-slide').forEach(s => s.remove());
             adDotsContainer.innerHTML = '';
             slides = [];
@@ -518,7 +669,6 @@
             adInterval = setInterval(nextSlide, adDuration);
         }
 
-        // ============ Toast ============
         const toastEl = document.getElementById('toast');
         let toastTimer;
 
@@ -529,11 +679,10 @@
             toastTimer = setTimeout(() => toastEl.classList.remove('show'), 2000);
         }
 
-        // ============ القنوات ============
         const channels = [
-            { id: 1, name: 'Blue Sport 1', image: 'https://i.postimg.cc/dVNxgBLJ/20260603-150404.png', live: true },
-            { id: 2, name: 'Blue Sport 2', image: 'https://i.postimg.cc/dVNxgBLJ/20260603-150404.png', live: true },
-            { id: 3, name: 'Blue Sport 3', image: 'https://i.postimg.cc/dVNxgBLJ/20260603-150404.png', live: false }
+            { id: 1, name: 'Blue Sport 1', image: 'https://i.postimg.cc/dVNxgBLJ/20260603-150404.png', stream: 'https://test-streams.mux.dev/x36xhzz/x36xhzz.m3u8' },
+            { id: 2, name: 'Blue Sport 2', image: 'https://i.postimg.cc/dVNxgBLJ/20260603-150404.png', stream: 'https://test-streams.mux.dev/x36xhzz/x36xhzz.m3u8' },
+            { id: 3, name: 'Blue Sport 3', image: 'https://i.postimg.cc/dVNxgBLJ/20260603-150404.png', stream: 'https://test-streams.mux.dev/x36xhzz/x36xhzz.m3u8' }
         ];
 
         function renderChannels() {
@@ -552,13 +701,146 @@
                     const id = card.dataset.id;
                     const channel = channels.find(c => c.id == id);
                     if (channel) {
-                        showToast(`جاري تحميل ${channel.name}...`, 'play_circle');
+                        openPlayer(channel);
                     }
                 });
             });
         }
 
-        // ============ القائمة الجانبية ============
+        // إدارة المشغل
+        let jwPlayerInstance = null;
+        let isStretched = false; // الوضع الافتراضي 16:9 (uniform)
+
+        const playerOverlay = document.getElementById('playerOverlay');
+        const playerLoading = document.getElementById('playerLoading');
+        const qualityPopup = document.getElementById('qualityPopup');
+        const qualityBtn = document.getElementById('qualityBtn');
+        const playBtn = document.getElementById('playBtn');
+        const muteBtn = document.getElementById('muteBtn');
+        const aspectRatioBtn = document.getElementById('aspectRatioBtn');
+        const playerCloseBtn = document.getElementById('playerCloseBtn');
+
+        function openPlayer(channel) {
+            playerOverlay.classList.add('active');
+            playerLoading.classList.add('show');
+            if (!jwPlayerInstance) {
+                jwPlayerInstance = jwplayer("jwPlayerWrapper");
+            }
+            // يبدأ دائماً بوضع 16:9 (uniform)
+            jwPlayerInstance.setup({
+                file: channel.stream,
+                type: 'hls',
+                width: '100%',
+                height: '100%',
+                autostart: true,
+                mute: false,
+                volume: 100,
+                stretching: 'uniform',
+                controls: false,
+                playbackRateControls: true,
+                playbackRates: [0.5, 1, 1.25, 1.5, 2],
+            });
+            jwPlayerInstance.on('play', () => {
+                playerLoading.classList.remove('show');
+                updatePlayIcon('pause');
+            });
+            jwPlayerInstance.on('pause', () => updatePlayIcon('play_arrow'));
+            jwPlayerInstance.on('ready', () => {
+                playerLoading.classList.remove('show');
+                updatePlayIcon('pause');
+                // تأكيد الوضع الافتراضي
+                isStretched = false;
+                updateAspectRatioIcon();
+            });
+            jwPlayerInstance.on('error', () => {
+                playerLoading.classList.remove('show');
+                showToast('تعذر تشغيل البث', 'error_outline');
+            });
+            jwPlayerInstance.on('levels', () => buildQualityPopup());
+        }
+
+        function closePlayer() {
+            playerOverlay.classList.remove('active');
+            if (jwPlayerInstance) {
+                jwPlayerInstance.remove();
+                jwPlayerInstance = null;
+            }
+            document.getElementById('jwPlayerWrapper').innerHTML = '';
+            isStretched = false;
+        }
+
+        function updatePlayIcon(state) {
+            playBtn.querySelector('.material-icons-round').textContent = state;
+        }
+        function updateMuteIcon(muted) {
+            muteBtn.querySelector('.material-icons-round').textContent = muted ? 'volume_off' : 'volume_up';
+        }
+        function updateAspectRatioIcon() {
+            const icon = aspectRatioBtn.querySelector('.material-icons-round');
+            icon.textContent = isStretched ? 'fit_screen' : 'aspect_ratio';
+        }
+
+        // زر تغيير وضع العرض
+        aspectRatioBtn.addEventListener('click', () => {
+            if (!jwPlayerInstance) return;
+            isStretched = !isStretched;
+            const newStretching = isStretched ? 'fill' : 'uniform';
+            jwPlayerInstance.setConfig({ stretching: newStretching });
+            updateAspectRatioIcon();
+            showToast(isStretched ? 'تمديد كامل' : '16:9', 'aspect_ratio');
+        });
+
+        playBtn.addEventListener('click', () => {
+            if (jwPlayerInstance) {
+                const state = jwPlayerInstance.getState();
+                state === 'playing' ? jwPlayerInstance.pause(true) : jwPlayerInstance.play(true);
+            }
+        });
+        muteBtn.addEventListener('click', () => {
+            if (jwPlayerInstance) {
+                const m = !jwPlayerInstance.getMute();
+                jwPlayerInstance.setMute(m);
+                updateMuteIcon(m);
+            }
+        });
+        qualityBtn.addEventListener('click', (e) => {
+            e.stopPropagation();
+            if (jwPlayerInstance && jwPlayerInstance.getQualityLevels().length > 1) {
+                qualityPopup.classList.toggle('active');
+            } else {
+                showToast('لا توجد جودات متعددة', 'info');
+            }
+        });
+        playerCloseBtn.addEventListener('click', closePlayer);
+
+        document.addEventListener('click', (e) => {
+            if (!qualityPopup.contains(e.target) && e.target !== qualityBtn) {
+                qualityPopup.classList.remove('active');
+            }
+        });
+
+        function buildQualityPopup() {
+            qualityPopup.innerHTML = '';
+            const levels = jwPlayerInstance.getQualityLevels();
+            if (!levels || levels.length <= 1) return;
+            levels.forEach((level, index) => {
+                const item = document.createElement('div');
+                item.className = 'quality-item';
+                item.textContent = level.label || (level.height ? `${level.height}p` : `جودة ${index+1}`);
+                item.addEventListener('click', () => {
+                    jwPlayerInstance.setCurrentQuality(index);
+                    qualityPopup.querySelectorAll('.quality-item').forEach(el => el.classList.remove('active'));
+                    item.classList.add('active');
+                    qualityPopup.classList.remove('active');
+                });
+                qualityPopup.appendChild(item);
+            });
+            const current = jwPlayerInstance.getCurrentQuality();
+            const items = qualityPopup.querySelectorAll('.quality-item');
+            if (items[current]) items[current].classList.add('active');
+        }
+
+        // القائمة الجانبية
         const menuOverlay = document.getElementById('menuOverlay');
         document.getElementById('menuToggle').addEventListener('click', () => {
             menuOverlay.classList.add('active');
@@ -574,7 +856,6 @@
         });
         menuOverlay.querySelectorAll('.menu-link').forEach(l => l.addEventListener('click', closeMenu));
 
-        // تأثير التمرير للهيدر
         window.addEventListener('scroll', () => {
             const header = document.getElementById('mainHeader');
             if (window.scrollY > 10) {
@@ -584,7 +865,6 @@
             }
         });
 
-        // ============ بدء التشغيل ============
         document.addEventListener('DOMContentLoaded', () => {
             createAdSlides();
             resetAdInterval();
