@@ -335,7 +335,6 @@
             text-shadow: 0 2px 6px rgba(0, 0, 0, 0.7);
         }
 
-        /* مشغل الفيديو */
         .player-overlay {
             position: fixed;
             inset: 0;
@@ -589,12 +588,11 @@
 
     <div class="channels-grid" id="channelsGrid"></div>
 
-    <!-- مشغل الفيديو -->
     <div class="player-overlay" id="playerOverlay">
         <button class="player-close-btn" id="playerCloseBtn">
             <span class="material-icons-round">close</span>
         </button>
-        <div class="player-wrapper">
+        <div class="player-wrapper" id="playerWrapper">
             <div id="jwPlayerWrapper"></div>
             <div class="player-loading" id="playerLoading"></div>
             <div class="player-controls" id="playerControls">
@@ -707,11 +705,10 @@
             });
         }
 
-        // إدارة المشغل
         let jwPlayerInstance = null;
-        let isStretched = false; // الوضع الافتراضي 16:9 (uniform)
-
+        let isStretched = false;
         const playerOverlay = document.getElementById('playerOverlay');
+        const playerWrapper = document.getElementById('playerWrapper');
         const playerLoading = document.getElementById('playerLoading');
         const qualityPopup = document.getElementById('qualityPopup');
         const qualityBtn = document.getElementById('qualityBtn');
@@ -726,7 +723,6 @@
             if (!jwPlayerInstance) {
                 jwPlayerInstance = jwplayer("jwPlayerWrapper");
             }
-            // يبدأ دائماً بوضع 16:9 (uniform)
             jwPlayerInstance.setup({
                 file: channel.stream,
                 type: 'hls',
@@ -740,6 +736,7 @@
                 playbackRateControls: true,
                 playbackRates: [0.5, 1, 1.25, 1.5, 2],
             });
+
             jwPlayerInstance.on('play', () => {
                 playerLoading.classList.remove('show');
                 updatePlayIcon('pause');
@@ -748,9 +745,10 @@
             jwPlayerInstance.on('ready', () => {
                 playerLoading.classList.remove('show');
                 updatePlayIcon('pause');
-                // تأكيد الوضع الافتراضي
                 isStretched = false;
                 updateAspectRatioIcon();
+                // طلب ملء الشاشة عند الجاهزية
+                requestFullscreen(playerWrapper);
             });
             jwPlayerInstance.on('error', () => {
                 playerLoading.classList.remove('show');
@@ -759,7 +757,24 @@
             jwPlayerInstance.on('levels', () => buildQualityPopup());
         }
 
+        function requestFullscreen(element) {
+            if (element.requestFullscreen) {
+                element.requestFullscreen().catch(() => {});
+            } else if (element.webkitRequestFullscreen) {
+                element.webkitRequestFullscreen();
+            } else if (element.msRequestFullscreen) {
+                element.msRequestFullscreen();
+            }
+        }
+
+        function exitFullscreen() {
+            if (document.fullscreenElement) {
+                document.exitFullscreen().catch(() => {});
+            }
+        }
+
         function closePlayer() {
+            exitFullscreen();
             playerOverlay.classList.remove('active');
             if (jwPlayerInstance) {
                 jwPlayerInstance.remove();
@@ -780,7 +795,6 @@
             icon.textContent = isStretched ? 'fit_screen' : 'aspect_ratio';
         }
 
-        // زر تغيير وضع العرض
         aspectRatioBtn.addEventListener('click', () => {
             if (!jwPlayerInstance) return;
             isStretched = !isStretched;
@@ -819,6 +833,13 @@
             }
         });
 
+        // عند الخروج من ملء الشاشة (مثلاً بالضغط على ESC) لا نغلق المشغل، فقط نبقيه
+        document.addEventListener('fullscreenchange', () => {
+            if (!document.fullscreenElement) {
+                // يمكن إظهار تنبيه أو تركه كما هو
+            }
+        });
+
         function buildQualityPopup() {
             qualityPopup.innerHTML = '';
             const levels = jwPlayerInstance.getQualityLevels();
@@ -840,7 +861,6 @@
             if (items[current]) items[current].classList.add('active');
         }
 
-        // القائمة الجانبية
         const menuOverlay = document.getElementById('menuOverlay');
         document.getElementById('menuToggle').addEventListener('click', () => {
             menuOverlay.classList.add('active');
