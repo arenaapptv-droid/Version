@@ -7,83 +7,25 @@
     <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons+Round" rel="stylesheet">
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-            -webkit-tap-highlight-color: transparent;
-        }
+        * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
         :root {
-            --bg-primary: #030303;
-            --bg-card: #161921;
-            --glass-bg: rgba(22, 25, 33, 0.7);
-            --glass-border: rgba(255, 255, 255, 0.08);
-            --text-primary: #F1F5F9;
-            --text-secondary: #94A3B8;
-            --accent-primary: #0055EF;
-            --live-red: #E53935;
-            --radius: 12px;
+            --bg-primary: #030303; --bg-card: #161921; --glass-bg: rgba(22, 25, 33, 0.7);
+            --glass-border: rgba(255, 255, 255, 0.08); --text-primary: #F1F5F9; --text-secondary: #94A3B8;
+            --accent-primary: #0055EF; --live-red: #E53935; --radius: 12px;
         }
-        body {
-            background: var(--bg-primary);
-            font-family: 'Cairo', sans-serif;
-            color: var(--text-primary);
-            overflow-x: hidden;
-            min-height: 100vh;
-            display: flex;
-            flex-direction: column;
-            background-image: radial-gradient(ellipse at 50% 0%, rgba(0,85,239,0.08) 0%, transparent 60%);
-        }
-        header {
-            height: 64px;
-            padding: 0 20px;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            position: sticky;
-            top: 0;
-            z-index: 1000;
-            background: rgba(3,3,3,0.8);
-            backdrop-filter: blur(24px);
-            border-bottom: 1px solid var(--glass-border);
-        }
+        body { background: var(--bg-primary); font-family: 'Cairo', sans-serif; color: var(--text-primary); display: flex; flex-direction: column; background-image: radial-gradient(ellipse at 50% 0%, rgba(0,85,239,0.08) 0%, transparent 60%); }
+        header { height: 64px; padding: 0 20px; display: flex; align-items: center; justify-content: space-between; position: sticky; top: 0; z-index: 1000; background: rgba(3,3,3,0.8); backdrop-filter: blur(24px); border-bottom: 1px solid var(--glass-border); }
         .header-logo { height: 40px; filter: drop-shadow(0 0 8px rgba(0,85,239,0.5)); }
-        .icon-btn {
-            width: 42px; height: 42px; border: none; border-radius: var(--radius);
-            background: var(--glass-bg); backdrop-filter: blur(8px);
-            border: 1px solid var(--glass-border); color: #fff;
-            display: flex; align-items: center; justify-content: center;
-            cursor: pointer;
-        }
-        .menu-overlay {
-            position: fixed; inset: 0; background: rgba(3,3,3,0.95);
-            backdrop-filter: blur(24px); z-index: 2000;
-            display: flex; align-items: center; justify-content: center;
-            opacity: 0; pointer-events: none; transition: opacity 0.4s;
-        }
+        .icon-btn { width: 42px; height: 42px; border: none; border-radius: var(--radius); background: var(--glass-bg); backdrop-filter: blur(8px); border: 1px solid var(--glass-border); color: #fff; display: flex; align-items: center; justify-content: center; cursor: pointer; }
+        .menu-overlay { position: fixed; inset: 0; background: rgba(3,3,3,0.95); backdrop-filter: blur(24px); z-index: 2000; display: flex; align-items: center; justify-content: center; opacity: 0; pointer-events: none; transition: opacity 0.4s; }
         .menu-overlay.active { opacity: 1; pointer-events: auto; }
-        .menu-close {
-            position: absolute; top: 24px; right: 24px;
-            background: rgba(255,255,255,0.1); border: none;
-            border-radius: var(--radius); width: 44px; height: 44px;
-            display: flex; align-items: center; justify-content: center;
-            cursor: pointer;
-        }
+        .menu-close { position: absolute; top: 24px; right: 24px; background: rgba(255,255,255,0.1); border: none; border-radius: var(--radius); width: 44px; height: 44px; display: flex; align-items: center; justify-content: center; cursor: pointer; }
         .menu-links { display: flex; flex-direction: column; gap: 8px; width: 80%; max-width: 320px; }
-        .menu-link {
-            display: block; padding: 14px 20px; border-radius: var(--radius);
-            background: rgba(255,255,255,0.03); color: var(--text-primary);
-            text-decoration: none; font-weight: 600; text-align: center;
-        }
+        .menu-link { display: block; padding: 14px 20px; border-radius: var(--radius); background: rgba(255,255,255,0.03); color: var(--text-primary); text-decoration: none; font-weight: 600; text-align: center; }
         .menu-link:hover { background: rgba(0,85,239,0.2); }
         .ad-container { width: 100%; background: #000; }
         .ad-aspect { position: relative; width: 100%; aspect-ratio: 16 / 9; background: #0a0a0a; }
-        .ad-slide {
-            position: absolute; inset: 0; background-size: cover; background-position: center;
-            opacity: 0; transition: opacity 0.6s ease; display: flex;
-            align-items: center; justify-content: center;
-            font-weight: bold; text-shadow: 0 2px 10px rgba(0,0,0,0.8);
-        }
+        .ad-slide { position: absolute; inset: 0; background-size: cover; background-position: center; opacity: 0; transition: opacity 0.6s ease; display: flex; align-items: center; justify-content: center; font-weight: bold; text-shadow: 0 2px 10px rgba(0,0,0,0.8); }
         .ad-slide.active { opacity: 1; z-index: 1; }
         .ad-dots { position: absolute; bottom: 16px; left: 50%; transform: translateX(-50%); display: flex; gap: 8px; z-index: 10; }
         .ad-dot { width: 10px; height: 10px; border-radius: 50%; background: rgba(255,255,255,0.4); cursor: pointer; }
@@ -92,101 +34,40 @@
         .section-title { font-size: 1.3rem; font-weight: 800; }
         .section-logo { height: 36px; width: 36px; border-radius: 8px; object-fit: contain; background: rgba(0,85,239,0.15); padding: 4px; }
         .channels-grid { padding: 0 20px 30px; display: grid; grid-template-columns: repeat(2,1fr); gap: 14px; }
-        .channel-card {
-            position: relative; border-radius: var(--radius); overflow: hidden;
-            background: var(--bg-card); cursor: pointer; aspect-ratio: 20 / 13;
-            transition: 0.25s; border: 1px solid transparent;
-            text-decoration: none; color: inherit; display: block;
-        }
+        .channel-card { position: relative; border-radius: var(--radius); overflow: hidden; background: var(--bg-card); cursor: pointer; aspect-ratio: 20 / 13; transition: 0.25s; border: 1px solid transparent; text-decoration: none; color: inherit; display: block; }
         .channel-card:hover { box-shadow: 0 12px 28px rgba(0,85,239,0.45); border-color: var(--accent-primary); transform: translateY(-4px); }
         .channel-image { width: 100%; height: 100%; object-fit: cover; }
         .channel-gradient { position: absolute; inset: 0; background: linear-gradient(to top, rgba(0,0,0,0.8) 0%, rgba(0,0,0,0.1) 50%, transparent 100%); pointer-events: none; }
         .channel-title { position: absolute; bottom: 12px; left: 10px; right: 10px; text-align: center; font-size: 14px; font-weight: 700; text-shadow: 0 2px 6px rgba(0,0,0,0.7); }
-        .player-overlay {
-            position: fixed; inset: 0; background: #000; z-index: 3000;
-            display: flex; align-items: center; justify-content: center;
-            opacity: 0; pointer-events: none; transition: opacity 0.3s;
-        }
+        .player-overlay { position: fixed; inset: 0; background: #000; z-index: 3000; display: flex; align-items: center; justify-content: center; opacity: 0; pointer-events: none; transition: opacity 0.3s; }
         .player-overlay.active { opacity: 1; pointer-events: auto; }
         .player-wrapper { width: 100%; height: 100%; position: relative; background: #000; overflow: hidden; }
         #videoPlayer { width: 100%; height: 100%; object-fit: contain; background: #000; }
-        .player-loading {
-            position: absolute; top: 50%; left: 50%; transform: translate(-50%,-50%);
-            width: 48px; height: 48px; border: 4px solid rgba(255,255,255,0.2);
-            border-top-color: var(--accent-primary); border-radius: 50%;
-            animation: spin 0.8s linear infinite; z-index: 30; display: none;
-        }
+        .player-loading { position: absolute; top: 50%; left: 50%; transform: translate(-50%,-50%); width: 48px; height: 48px; border: 4px solid rgba(255,255,255,0.2); border-top-color: var(--accent-primary); border-radius: 50%; animation: spin 0.8s linear infinite; z-index: 30; display: none; }
         .player-loading.show { display: block; }
         @keyframes spin { to { transform: translate(-50%,-50%) rotate(360deg); } }
-        .resolving-message {
-            position: absolute; bottom: 30%; left: 0; right: 0; text-align: center;
-            color: white; background: rgba(0,0,0,0.6); padding: 8px; z-index: 32;
-            font-size: 14px;
-        }
-        .player-error {
-            position: absolute; inset: 0; background: rgba(0,0,0,0.85);
-            backdrop-filter: blur(16px); display: none; flex-direction: column;
-            align-items: center; justify-content: center; z-index: 31;
-            gap: 16px; color: #fff; text-align: center;
-        }
+        .player-error { position: absolute; inset: 0; background: rgba(0,0,0,0.85); backdrop-filter: blur(16px); display: none; flex-direction: column; align-items: center; justify-content: center; z-index: 31; gap: 16px; color: #fff; text-align: center; }
         .retry-btn { background: var(--accent-primary); border: none; padding: 8px 20px; border-radius: 40px; color: white; font-weight: bold; cursor: pointer; }
-        .player-controls {
-            position: absolute; bottom: 20px; left: 20px; right: 20px;
-            background: linear-gradient(to top, rgba(0,0,0,0.8) 0%, rgba(0,0,0,0) 100%);
-            padding: 16px 12px 12px; border-radius: 16px; z-index: 35;
-            display: flex; flex-direction: column; gap: 12px;
-            transition: opacity 0.3s;
-        }
+        .player-controls { position: absolute; bottom: 20px; left: 20px; right: 20px; background: linear-gradient(to top, rgba(0,0,0,0.8) 0%, rgba(0,0,0,0) 100%); padding: 16px 12px 12px; border-radius: 16px; z-index: 35; display: flex; flex-direction: column; gap: 12px; transition: opacity 0.3s; }
         .player-top-bar { display: flex; justify-content: space-between; align-items: center; }
         .player-actions-row { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
-        .player-btn {
-            background: rgba(0,0,0,0.6); backdrop-filter: blur(12px);
-            border: none; width: 40px; height: 40px; border-radius: 50%;
-            display: flex; align-items: center; justify-content: center;
-            color: white; cursor: pointer;
-        }
+        .player-btn { background: rgba(0,0,0,0.6); backdrop-filter: blur(12px); border: none; width: 40px; height: 40px; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white; cursor: pointer; }
         .volume-wrapper { display: flex; align-items: center; gap: 8px; }
         #volumeSlider { width: 80px; height: 4px; accent-color: var(--accent-primary); }
         .player-progress-wrapper { flex: 1; display: flex; align-items: center; gap: 12px; direction: ltr; }
-        .progress-bar-container {
-            flex: 1; height: 5px; background: rgba(255,255,255,0.2);
-            border-radius: 5px; position: relative; cursor: pointer;
-        }
+        .progress-bar-container { flex: 1; height: 5px; background: rgba(255,255,255,0.2); border-radius: 5px; position: relative; cursor: pointer; }
         .progress-buffered { position: absolute; height: 100%; background: rgba(255,255,255,0.4); width: 0%; border-radius: 5px; }
         .progress-played { position: absolute; height: 100%; background: var(--accent-primary); width: 0%; border-radius: 5px; z-index: 2; }
-        .progress-handle {
-            position: absolute; width: 12px; height: 12px; background: white;
-            border-radius: 50%; top: 50%; transform: translate(-50%, -50%);
-            left: 0%; z-index: 3; opacity: 0;
-        }
+        .progress-handle { position: absolute; width: 12px; height: 12px; background: white; border-radius: 50%; top: 50%; transform: translate(-50%, -50%); left: 0%; z-index: 3; opacity: 0; }
         .progress-bar-container:hover .progress-handle { opacity: 1; }
         .time-display { font-size: 12px; font-weight: 500; background: rgba(0,0,0,0.5); padding: 4px 8px; border-radius: 20px; }
-        .player-live-btn {
-            background: var(--live-red); color: white; border: none;
-            border-radius: 20px; padding: 6px 16px; font-weight: bold;
-            font-size: 12px; cursor: pointer;
-        }
+        .player-live-btn { background: var(--live-red); color: white; border: none; border-radius: 20px; padding: 6px 16px; font-weight: bold; font-size: 12px; cursor: pointer; }
         .player-live-btn.is-live { background: #2c2c2c; }
-        .quality-pill {
-            background: rgba(0,0,0,0.6); border-radius: 20px; padding: 6px 12px;
-            font-size: 12px; display: flex; align-items: center; gap: 6px; cursor: pointer;
-        }
-        .quality-dropdown {
-            position: absolute; bottom: 70px; right: 20px;
-            background: #1e1e2e; backdrop-filter: blur(12px);
-            border-radius: 12px; padding: 8px 0; min-width: 130px;
-            display: none; flex-direction: column; z-index: 40;
-            border: 1px solid rgba(255,255,255,0.1);
-        }
+        .quality-pill { background: rgba(0,0,0,0.6); border-radius: 20px; padding: 6px 12px; font-size: 12px; display: flex; align-items: center; gap: 6px; cursor: pointer; }
+        .quality-dropdown { position: absolute; bottom: 70px; right: 20px; background: #1e1e2e; backdrop-filter: blur(12px); border-radius: 12px; padding: 8px 0; min-width: 130px; display: none; flex-direction: column; z-index: 40; border: 1px solid rgba(255,255,255,0.1); }
         .quality-option { background: transparent; border: none; padding: 10px 16px; color: white; text-align: right; cursor: pointer; font-size: 13px; }
         .quality-option.active { color: var(--accent-primary); font-weight: bold; }
-        .player-close-btn {
-            position: absolute; top: 20px; right: 20px; z-index: 45;
-            background: rgba(0,0,0,0.6); backdrop-filter: blur(10px);
-            border: none; width: 44px; height: 44px; border-radius: 50%;
-            color: white; display: flex; align-items: center; justify-content: center;
-            cursor: pointer;
-        }
+        .player-close-btn { position: absolute; top: 20px; right: 20px; z-index: 45; background: rgba(0,0,0,0.6); backdrop-filter: blur(10px); border: none; width: 44px; height: 44px; border-radius: 50%; color: white; display: flex; align-items: center; justify-content: center; cursor: pointer; }
         .autohide .player-controls { opacity: 0; pointer-events: none; }
         .autohide .player-close-btn { opacity: 0; }
         .toast-container { position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%); z-index: 9999; pointer-events: none; }
@@ -196,7 +77,6 @@
         @media (min-width:768px) { .channels-grid { grid-template-columns: repeat(4,1fr); gap: 18px; } }
     </style>
     <script src="https://cdn.jsdelivr.net/npm/hls.js@latest"></script>
-    <script src="https://cdn.dashjs.org/latest/dash.all.min.js"></script>
 </head>
 <body>
 <header>
@@ -219,7 +99,6 @@
     <div class="player-wrapper" id="playerWrapper">
         <video id="videoPlayer" preload="auto" playsinline></video>
         <div class="player-loading" id="playerLoading"></div>
-        <div class="resolving-message" id="resolvingMsg" style="display:none;">جاري تجهيز البث (متابعة التوجيه)...</div>
         <div class="player-error" id="playerError">
             <span class="material-icons-round" style="font-size:48px">error_outline</span>
             <p id="playerErrorText">حدث خطأ في البث</p>
@@ -254,6 +133,281 @@
 <div class="toast-container"><div class="toast" id="toast"></div></div>
 <footer class="site-footer">جميع الحقوق محفوظة لـ <a href="https://t.me/blue_sport_tv" target="_blank">Team Blue Sport</a></footer>
 
-<script src="player.js"></script>
+<script>
+    (function(){
+        // UI helpers
+        const toastEl = document.getElementById('toast');
+        let toastTimer;
+        function showToast(msg, icon='info'){
+            clearTimeout(toastTimer);
+            toastEl.innerHTML = `<span class="material-icons-round">${icon}</span> ${msg}`;
+            toastEl.classList.add('show');
+            toastTimer = setTimeout(()=>toastEl.classList.remove('show'), 3000);
+        }
+
+        // Carousel ads
+        const ads = [
+            { image: 'https://i.postimg.cc/kGmCkdn1/20260607-170253.png', text: 'Blue Sport' },
+            { image: 'https://i.postimg.cc/dVNxgBLJ/20260603-150404.png', text: 'قنواتنا حصرياً' },
+            { image: '', color: '#0d1b3e', text: 'تابع كل المباريات' }
+        ];
+        const adBanner = document.getElementById('adBanner');
+        const adDotsContainer = document.getElementById('adDots');
+        let currentAdIndex=0, adInterval, slides=[];
+        function createAdSlides(){
+            adBanner.querySelectorAll('.ad-slide').forEach(s=>s.remove());
+            adDotsContainer.innerHTML='';
+            slides=[];
+            ads.forEach((ad,idx)=>{
+                const slide=document.createElement('div'); slide.className='ad-slide';
+                if(ad.image) slide.style.backgroundImage=`url('${ad.image}')`;
+                else { slide.style.backgroundColor=ad.color; slide.textContent=ad.text; }
+                adBanner.appendChild(slide); slides.push(slide);
+                const dot=document.createElement('span'); dot.className='ad-dot'; dot.dataset.index=idx;
+                dot.addEventListener('click',()=>{ goToSlide(idx); resetAdInterval(); });
+                adDotsContainer.appendChild(dot);
+            });
+            goToSlide(0);
+        }
+        function goToSlide(idx){ slides.forEach((s,i)=>s.classList.toggle('active',i===idx)); adDotsContainer.querySelectorAll('.ad-dot').forEach((d,i)=>d.classList.toggle('active',i===idx)); currentAdIndex=idx; }
+        function nextSlide(){ goToSlide((currentAdIndex+1)%ads.length); }
+        function resetAdInterval(){ clearInterval(adInterval); adInterval=setInterval(nextSlide,5000); }
+
+        // Channels with direct m3u8 (they redirect normally and work in browser)
+        const channels = [
+            { id:1, name:'Blue Sport 1', image:'https://i.postimg.cc/dVNxgBLJ/20260603-150404.png', streamUrl:'https://bluesport.fun/live/blue_sport_1/index.m3u8', type:'hls' },
+            { id:2, name:'Blue Sport 2', image:'https://i.postimg.cc/dVNxgBLJ/20260603-150404.png', streamUrl:'https://bluesport.fun/live/blue_sport_2/index.m3u8', type:'hls' },
+            { id:3, name:'Blue Sport 3', image:'https://i.postimg.cc/dVNxgBLJ/20260603-150404.png', streamUrl:'https://bluesport.fun/live/blue_sport_3/index.m3u8', type:'hls' }
+        ];
+
+        function renderChannels(){
+            const grid=document.getElementById('channelsGrid');
+            grid.innerHTML=channels.map(ch=>`<a href="#" class="channel-card" data-id="${ch.id}"><img class="channel-image" src="${ch.image}" alt="${ch.name}"><div class="channel-gradient"></div><div class="channel-title">${ch.name}</div></a>`).join('');
+            grid.querySelectorAll('.channel-card').forEach(card=>{
+                card.addEventListener('click',(e)=>{
+                    e.preventDefault();
+                    const id=parseInt(card.dataset.id);
+                    const ch=channels.find(c=>c.id===id);
+                    if(ch) openPlayer(ch);
+                });
+            });
+        }
+
+        // Player elements
+        const video=document.getElementById('videoPlayer');
+        const loadingEl=document.getElementById('playerLoading');
+        const errorEl=document.getElementById('playerError');
+        const errorText=document.getElementById('playerErrorText');
+        const playPauseBtn=document.getElementById('btnPlayPause');
+        const muteBtn=document.getElementById('btnMute');
+        const fullscreenBtn=document.getElementById('btnFullscreen');
+        const qualityBtn=document.getElementById('btnQuality');
+        const qualityDropdown=document.getElementById('qualityDropdown');
+        const liveBtn=document.getElementById('btnLive');
+        const volumeSlider=document.getElementById('volumeSlider');
+        const progressWrapper=document.getElementById('progressWrapper');
+        const progressPlayed=document.getElementById('progressPlayed');
+        const progressBuffered=document.getElementById('progressBuffered');
+        const progressHandle=document.getElementById('progressHandle');
+        const currentTimeSpan=document.getElementById('currentTime');
+        const totalTimeSpan=document.getElementById('totalTime');
+        const qualityTracker=document.getElementById('qualityTracker');
+        const playerWrapperDiv=document.getElementById('playerWrapper');
+        const playerOverlay=document.getElementById('playerOverlay');
+        const playerCloseBtn=document.getElementById('playerCloseBtn');
+        const manualRetryBtn=document.getElementById('manualRetryBtn');
+
+        let currentHls=null;
+        let isDVR=false;
+        let controlsTimeout=null;
+        let currentChannelObj=null;
+        let retryAttempt=0;
+        const MAX_RETRIES=2;
+
+        function showLoading(show){ loadingEl.style.display=show?'flex':'none'; }
+        function showError(show,msg=''){ errorEl.style.display=show?'flex':'none'; if(msg) errorText.innerText=msg; if(show){ showLoading(false); } }
+        function formatTime(sec){ if(isNaN(sec)) return '00:00'; sec=Math.floor(Math.abs(sec)); let m=Math.floor(sec/60), s=sec%60; if(m>=60) return `${Math.floor(m/60)}:${(m%60).toString().padStart(2,'0')}:${s.toString().padStart(2,'0')}`; return `${m}:${s.toString().padStart(2,'0')}`; }
+        function updatePlayPauseIcon(){ playPauseBtn.innerHTML=`<span class="material-icons-round">${video.paused?'play_arrow':'pause'}</span>`; }
+        function updateMuteUI(){
+            if(video.muted || video.volume===0) muteBtn.innerHTML='<span class="material-icons-round">volume_off</span>';
+            else if(video.volume<0.5) muteBtn.innerHTML='<span class="material-icons-round">volume_down</span>';
+            else muteBtn.innerHTML='<span class="material-icons-round">volume_up</span>';
+            if(volumeSlider) volumeSlider.value=video.muted?0:video.volume;
+        }
+        function updateProgress(){
+            if(!video.duration) return;
+            if(isDVR && video.seekable && video.seekable.length){
+                let start=video.seekable.start(0), end=video.seekable.end(0), dur=end-start, cur=video.currentTime-start, per=(cur/dur)*100;
+                if(progressPlayed) progressPlayed.style.width=`${Math.min(per,100)}%`;
+                if(progressHandle) progressHandle.style.left=`${Math.min(per,100)}%`;
+                if(currentTimeSpan) currentTimeSpan.textContent=formatTime(cur);
+                if(totalTimeSpan) totalTimeSpan.textContent=formatTime(dur);
+                let atLive = (end - video.currentTime) < 5;
+                if(liveBtn){ if(atLive){ liveBtn.classList.add('is-live'); liveBtn.textContent='مباشر'; } else { liveBtn.classList.remove('is-live'); liveBtn.textContent='العودة إلى المباشر'; } }
+            } else {
+                let per=(video.currentTime/video.duration)*100;
+                if(progressPlayed) progressPlayed.style.width=`${per}%`;
+                if(progressHandle) progressHandle.style.left=`${per}%`;
+                if(currentTimeSpan) currentTimeSpan.textContent=formatTime(video.currentTime);
+                if(totalTimeSpan) totalTimeSpan.textContent=formatTime(video.duration);
+            }
+        }
+        function updateBufferedBar(){
+            if(!isDVR && video.buffered.length){
+                let perc=(video.buffered.end(video.buffered.length-1)/video.duration)*100;
+                if(progressBuffered) progressBuffered.style.width=`${Math.min(perc,100)}%`;
+            } else if(isDVR && video.seekable && video.seekable.length && video.buffered.length){
+                let start=video.seekable.start(0), end=video.seekable.end(0), dur=end-start, buffEnd=video.buffered.end(video.buffered.length-1);
+                let perc=((buffEnd-start)/dur)*100;
+                if(progressBuffered) progressBuffered.style.width=`${Math.min(perc,100)}%`;
+            }
+        }
+        function seekToLive(){ if(video.seekable && video.seekable.length) video.currentTime=video.seekable.end(0)-2; }
+        function toggleFullscreen(){ let elem=playerWrapperDiv; if(!document.fullscreenElement){ if(elem.requestFullscreen) elem.requestFullscreen(); else if(elem.webkitRequestFullscreen) elem.webkitRequestFullscreen(); } else { if(document.exitFullscreen) document.exitFullscreen(); } }
+        function destroyPlayer(){
+            if(currentHls){ currentHls.destroy(); currentHls=null; }
+            video.pause();
+            video.removeAttribute('src');
+            video.load();
+            isDVR=false;
+            if(liveBtn) liveBtn.style.display='none';
+        }
+        function setupQualityLevels(levels){
+            if(!levels || levels.length<=1){ qualityDropdown.style.display='none'; return; }
+            let html='<button class="quality-option active" data-level="-1">تلقائي</button>';
+            levels.forEach((lvl,idx)=>{ let label=lvl.height?`${lvl.height}p`:`جودة ${idx+1}`; html+=`<button class="quality-option" data-level="${idx}">${label}</button>`; });
+            qualityDropdown.innerHTML=html;
+            qualityDropdown.querySelectorAll('.quality-option').forEach(btn=>{
+                btn.addEventListener('click',()=>{
+                    let level=parseInt(btn.dataset.level);
+                    if(currentHls){ currentHls.currentLevel=level; qualityTracker.textContent=btn.textContent; }
+                    qualityDropdown.querySelectorAll('.quality-option').forEach(o=>o.classList.remove('active'));
+                    btn.classList.add('active');
+                    qualityDropdown.style.display='none';
+                });
+            });
+        }
+        function checkDVRSupport(){
+            let interval=setInterval(()=>{
+                if(video.seekable && video.seekable.length && (video.seekable.end(0)-video.seekable.start(0))>15){
+                    isDVR=true;
+                    if(liveBtn) liveBtn.style.display='inline-flex';
+                    clearInterval(interval);
+                }
+            },1000);
+            setTimeout(()=>clearInterval(interval),8000);
+        }
+
+        function initPlayerWithUrl(url){
+            destroyPlayer();
+            showLoading(true);
+            showError(false);
+            if(Hls.isSupported()){
+                currentHls = new Hls({
+                    maxBufferLength:60,
+                    liveSyncDurationCount:2,
+                    enableWorker:true,
+                    xhrSetup: (xhr, url) => {
+                        xhr.withCredentials = false;
+                        // السماح بمتابعة التوجيهات تلقائياً
+                    }
+                });
+                currentHls.loadSource(url);
+                currentHls.attachMedia(video);
+                currentHls.on(Hls.Events.MANIFEST_PARSED, (_,data)=>{
+                    showLoading(false);
+                    video.play().catch(e=>console.log("autoplay blocked"));
+                    setupQualityLevels(data.levels);
+                    checkDVRSupport();
+                    retryAttempt=0;
+                });
+                currentHls.on(Hls.Events.ERROR, (_,data)=>{
+                    if(data.fatal){
+                        if(retryAttempt < MAX_RETRIES){
+                            retryAttempt++;
+                            showToast(`إعادة محاولة ${retryAttempt}/${MAX_RETRIES}...`, 'refresh');
+                            setTimeout(()=>{
+                                if(currentChannelObj) initPlayerWithUrl(currentChannelObj.streamUrl);
+                            },2000);
+                        } else {
+                            showError(true,'فشل تشغيل البث. تأكد من الاتصال بالإنترنت أو حاول لاحقاً.');
+                        }
+                    }
+                });
+            } else if(video.canPlayType('application/vnd.apple.mpegurl')){
+                video.src=url;
+                video.addEventListener('loadedmetadata',()=>{ showLoading(false); video.play(); checkDVRSupport(); });
+                video.addEventListener('error',()=>showError(true,'خطأ في تشغيل البث'));
+            } else {
+                showError(true,'المتصفح لا يدعم HLS');
+            }
+            video.addEventListener('timeupdate',()=>{ updateProgress(); updateBufferedBar(); });
+            video.addEventListener('waiting',()=>showLoading(true));
+            video.addEventListener('playing',()=>{ showLoading(false); showError(false); updatePlayPauseIcon(); });
+            video.addEventListener('pause',updatePlayPauseIcon);
+            video.addEventListener('volumechange',updateMuteUI);
+            video.addEventListener('loadedmetadata',()=>{ updateProgress(); if(!isDVR) totalTimeSpan.textContent=formatTime(video.duration); });
+        }
+
+        function openPlayer(channel){
+            currentChannelObj = channel;
+            playerOverlay.classList.add('active');
+            retryAttempt=0;
+            initPlayerWithUrl(channel.streamUrl);
+            let showCtrl=()=>{
+                playerWrapperDiv.classList.remove('autohide');
+                clearTimeout(controlsTimeout);
+                if(!video.paused) controlsTimeout=setTimeout(()=>playerWrapperDiv.classList.add('autohide'),3000);
+            };
+            playerWrapperDiv.addEventListener('mousemove',showCtrl);
+            playerWrapperDiv.addEventListener('touchstart',showCtrl);
+            showCtrl();
+        }
+        function closePlayer(){
+            destroyPlayer();
+            playerOverlay.classList.remove('active');
+            if(document.fullscreenElement) document.exitFullscreen();
+            currentChannelObj=null;
+            retryAttempt=0;
+        }
+        function manualRetry(){ if(currentChannelObj) { retryAttempt=0; initPlayerWithUrl(currentChannelObj.streamUrl); } }
+
+        // Event bindings
+        playPauseBtn.addEventListener('click',()=>{ video.paused ? video.play() : video.pause(); });
+        muteBtn.addEventListener('click',()=>{ video.muted=!video.muted; });
+        volumeSlider.addEventListener('input',(e)=>{ video.volume=parseFloat(e.target.value); video.muted=false; updateMuteUI(); });
+        fullscreenBtn.addEventListener('click',toggleFullscreen);
+        liveBtn.addEventListener('click',seekToLive);
+        qualityBtn.addEventListener('click',(e)=>{ e.stopPropagation(); qualityDropdown.style.display = qualityDropdown.style.display==='none' ? 'flex' : 'none'; });
+        document.addEventListener('click',()=>qualityDropdown.style.display='none');
+        if(progressWrapper) progressWrapper.addEventListener('click',(e)=>{
+            if(!video.duration && !isDVR) return;
+            let rect=progressWrapper.getBoundingClientRect();
+            let percent=(e.clientX-rect.left)/rect.width;
+            percent=Math.min(1,Math.max(0,percent));
+            if(isDVR && video.seekable && video.seekable.length){
+                let start=video.seekable.start(0), end=video.seekable.end(0);
+                video.currentTime=start+(percent*(end-start));
+            } else video.currentTime=percent*video.duration;
+        });
+        playerCloseBtn.addEventListener('click',closePlayer);
+        manualRetryBtn.addEventListener('click',manualRetry);
+
+        // menu
+        const menuOverlayDiv=document.getElementById('menuOverlay');
+        document.getElementById('menuToggle').addEventListener('click',()=>{ menuOverlayDiv.classList.add('active'); document.body.style.overflow='hidden'; });
+        function closeMenu(){ menuOverlayDiv.classList.remove('active'); document.body.style.overflow=''; }
+        document.getElementById('menuCloseBtn').addEventListener('click',closeMenu);
+        menuOverlayDiv.addEventListener('click',e=>{ if(e.target===menuOverlayDiv) closeMenu(); });
+        document.querySelectorAll('.menu-link').forEach(l=>l.addEventListener('click',closeMenu));
+        window.addEventListener('scroll',()=>{ let h=document.querySelector('header'); if(window.scrollY>10) h.classList.add('scrolled'); else h.classList.remove('scrolled'); });
+
+        document.addEventListener('DOMContentLoaded',()=>{
+            createAdSlides();
+            resetAdInterval();
+            renderChannels();
+        });
+    })();
+</script>
 </body>
 </html>
