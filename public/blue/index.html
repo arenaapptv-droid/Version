@@ -217,7 +217,7 @@
         <div class="player-error" id="playerError">
             <span class="material-icons-round" style="font-size:48px">error_outline</span>
             <p id="playerErrorText">حدث خطأ في البث</p>
-            <button class="retry-btn" onclick="window.retryStream?.()">إعادة المحاولة</button>
+            <button class="retry-btn" id="manualRetryBtn">إعادة المحاولة</button>
         </div>
         <div class="player-controls" id="playerControls">
             <div class="player-top-bar">
@@ -302,6 +302,9 @@
         });
     }
     let currentHls = null, currentDash = null, isDVR = false, controlsTimeout = null;
+    let retryCount = 0;
+    const MAX_RETRIES = 3;
+    let currentChannel = null;
     const video = document.getElementById('videoPlayer');
     const loadingEl = document.getElementById('playerLoading');
     const errorEl = document.getElementById('playerError');
@@ -323,6 +326,8 @@
     const playerWrapperDiv = document.getElementById('playerWrapper');
     const playerOverlay = document.getElementById('playerOverlay');
     const playerCloseBtn = document.getElementById('playerCloseBtn');
+    const manualRetryBtn = document.getElementById('manualRetryBtn');
+    
     function showLoading(show) { loadingEl.style.display = show ? 'flex' : 'none'; }
     function showError(show, msg='') { errorEl.style.display = show ? 'flex' : 'none'; if(msg) errorText.innerText = msg; if(show) showLoading(false); }
     function formatTime(sec) { if(isNaN(sec)) return '00:00'; sec=Math.floor(Math.abs(sec)); let m=Math.floor(sec/60), s=sec%60; if(m>=60) return `${Math.floor(m/60)}:${(m%60).toString().padStart(2,'0')}:${s.toString().padStart(2,'0')}`; return `${m}:${s.toString().padStart(2,'0')}`; }
@@ -352,7 +357,16 @@
     }
     function seekToLive() { if(video.seekable && video.seekable.length) video.currentTime=video.seekable.end(0)-2; }
     function toggleFullscreen() { let elem=playerWrapperDiv; if(!document.fullscreenElement) { if(elem.requestFullscreen) elem.requestFullscreen(); else if(elem.webkitRequestFullscreen) elem.webkitRequestFullscreen(); } else { if(document.exitFullscreen) document.exitFullscreen(); } }
-    function destroyPlayer() { if(currentHls) { currentHls.destroy(); currentHls=null; } if(currentDash) { currentDash.reset(); currentDash=null; } video.pause(); video.removeAttribute('src'); video.load(); isDVR=false; if(liveBtn) liveBtn.style.display='none'; }
+    function destroyPlayer() { 
+        if(currentHls) { currentHls.destroy(); currentHls=null; } 
+        if(currentDash) { currentDash.reset(); currentDash=null; } 
+        video.pause(); 
+        video.removeAttribute('src'); 
+        video.load(); 
+        isDVR=false; 
+        if(liveBtn) liveBtn.style.display='none';
+        retryCount = 0;
+    }
     function setupQualityLevels(levels) {
         if(!levels || levels.length<=1) { qualityDropdown.style.display='none'; return; }
         let html='<button class="quality-option active" data-level="-1">تلقائي</button>';
@@ -365,16 +379,41 @@
         setTimeout(()=>clearInterval(interval),8000);
     }
     function initPlayer(channel) {
-        destroyPlayer(); showLoading(true); showError(false);
+        if(!channel) return;
+        currentChannel = channel;
+        destroyPlayer(); 
+        showLoading(true); 
+        showError(false);
         let url=channel.streamUrl;
         if(Hls.isSupported()) {
-            currentHls=new Hls({ maxBufferLength:60, liveSyncDurationCount:2, enableWorker:true, xhrSetup: (xhr) => { xhr.withCredentials=false; } });
+            currentHls=new Hls({ 
+                maxBufferLength: 60, 
+                liveSyncDurationCount: 2, 
+                enableWorker: true,
+                xhrSetup: (xhr, url) => { 
+                    xhr.withCredentials = false;
+                }
+            });
             currentHls.loadSource(url);
             currentHls.attachMedia(video);
-            currentHls.on(Hls.Events.MANIFEST_PARSED, (_,data)=>{ showLoading(false); video.play().catch(e=>console.log); setupQualityLevels(data.levels); checkDVRSupport(); });
-            currentHls.on(Hls.Events.ERROR, (_,data)=>{ if(data.fatal) showError(true,'خطأ في البث (قد يكون الرابط يحتاج تحديث)'); });
-        } else if(video.canPlayType('application/vnd.apple.mpegurl')) { video.src=url; video.addEventListener('loadedmetadata',()=>{ showLoading(false); video.play(); checkDVRSupport(); }); }
-        else showError(true,'المتصفح لا يدعم HLS');
+            currentHls.on(Hls.Events.MANIFEST_PARSED, (_,data)=>{ showLoading(false); video.play().catch(e=>console.log); setupQualityLevels(data.levels); checkDVRSupport(); retryCount=0; });
+            currentHls.on(Hls.Events.ERROR, (_,data)=>{
+                if(data.fatal) {
+                    if(retryCount < MAX_RETRIES) {
+                        retryCount++;
+                        showToast(`إعادة المحاولة ${retryCount}/${MAX_RETRIES}...`, 'refresh');
+                        setTimeout(() => { if(currentChannel) initPlayer(currentChannel); }, 2000);
+                    } else {
+                        showError(true, 'لا يمكن الاتصال بالبث. تأكد من اتصالك بالإنترنت أو حاول لاحقاً.');
+                    }
+                }
+            });
+        } else if(video.canPlayType('application/vnd.apple.mpegurl')) { 
+            video.src=url; 
+            video.addEventListener('loadedmetadata',()=>{ showLoading(false); video.play(); checkDVRSupport(); }); 
+            video.addEventListener('error',()=>{ showError(true,'فشل تشغيل البث'); });
+        } else showError(true,'المتصفح لا يدعم HLS');
+        
         video.addEventListener('timeupdate',()=>{ updateProgress(); updateBufferedBar(); });
         video.addEventListener('waiting',()=>showLoading(true));
         video.addEventListener('playing',()=>{ showLoading(false); showError(false); updatePlayPauseIcon(); });
@@ -383,7 +422,7 @@
         video.addEventListener('loadedmetadata',()=>{ updateProgress(); if(!isDVR) totalTimeSpan.textContent=formatTime(video.duration); });
     }
     function openPlayer(channel) {
-        window.CHANNEL_DATA = channel;
+        currentChannel = channel;
         playerOverlay.classList.add('active');
         initPlayer(channel);
         let showCtrl=()=>{ playerWrapperDiv.classList.remove('autohide'); clearTimeout(controlsTimeout); if(!video.paused) controlsTimeout=setTimeout(()=>playerWrapperDiv.classList.add('autohide'),3000); };
@@ -391,7 +430,9 @@
         playerWrapperDiv.addEventListener('touchstart',showCtrl);
         showCtrl();
     }
-    function closePlayer() { destroyPlayer(); playerOverlay.classList.remove('active'); if(document.fullscreenElement) document.exitFullscreen(); }
+    function closePlayer() { destroyPlayer(); playerOverlay.classList.remove('active'); if(document.fullscreenElement) document.exitFullscreen(); currentChannel=null; }
+    function manualRetry() { if(currentChannel) { retryCount=0; initPlayer(currentChannel); } }
+    
     playPauseBtn.addEventListener('click',()=>{ video.paused ? video.play() : video.pause(); });
     muteBtn.addEventListener('click',()=>{ video.muted=!video.muted; });
     volumeSlider.addEventListener('input',(e)=>{ video.volume=parseFloat(e.target.value); video.muted=false; updateMuteUI(); });
@@ -408,6 +449,8 @@
         else video.currentTime=percent*video.duration;
     });
     playerCloseBtn.addEventListener('click',closePlayer);
+    manualRetryBtn.addEventListener('click',manualRetry);
+    
     const menuOverlayDiv = document.getElementById('menuOverlay');
     document.getElementById('menuToggle').addEventListener('click',()=>{ menuOverlayDiv.classList.add('active'); document.body.style.overflow='hidden'; });
     function closeMenu() { menuOverlayDiv.classList.remove('active'); document.body.style.overflow=''; }
@@ -416,7 +459,6 @@
     document.querySelectorAll('.menu-link').forEach(l=>l.addEventListener('click',closeMenu));
     window.addEventListener('scroll',()=>{ let h=document.querySelector('header'); if(window.scrollY>10) h.classList.add('scrolled'); else h.classList.remove('scrolled'); });
     document.addEventListener('DOMContentLoaded',()=>{ createAdSlides(); resetAdInterval(); renderChannels(); });
-    window.retryStream = () => { if(window.CHANNEL_DATA) initPlayer(window.CHANNEL_DATA); };
 </script>
 </body>
 </html>
