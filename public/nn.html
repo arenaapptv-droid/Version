@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="referrer" content="no-referrer">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>Rplay</title>
+    <title>Rplay - Blue Sport</title>
     <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons+Round" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.2.1/css/all.min.css">
@@ -65,10 +65,10 @@
         .quality-item { padding:10px 20px; color:#fff; cursor:pointer; font-size:14px; text-align:center; white-space:nowrap; transition:background 0.2s; }
         .quality-item:hover { background:rgba(255,255,255,0.1); }
         .quality-item.active { color:var(--accent-primary); font-weight:bold; }
-        .categories { display:flex; gap:8px; overflow-x:auto; padding:20px 16px 8px; }
-        .category { padding:10px 20px; border-radius:var(--radius); background:var(--bg-card); color:var(--text-secondary); font-size:14px; font-weight:600; white-space:nowrap; cursor:pointer; border:1px solid transparent; }
-        .category.active { background:var(--accent-primary); color:#fff; }
-        .channels { padding:8px 12px 30px; display:grid; grid-template-columns:repeat(2,1fr); gap:10px; }
+        .sport-header { display:flex; align-items:center; justify-content:space-between; padding:12px 20px; background:var(--bg-secondary); border-bottom:1px solid var(--glass-border); margin-bottom:10px; }
+        .sport-header .sport-text { font-size:16px; font-weight:700; color:var(--text-primary); }
+        .sport-header img { height:32px; object-fit:contain; }
+        .channels { padding:8px 12px 30px; display:grid; grid-template-columns:repeat(3,1fr); gap:10px; max-width:600px; margin:0 auto; }
         .channel-card { position:relative; border-radius:var(--radius); overflow:hidden; background:var(--bg-card); cursor:pointer; box-shadow:0 4px 12px rgba(0,0,0,0.4); aspect-ratio:20/13; transition:box-shadow 0.2s, border-color 0.2s; border:1px solid transparent; }
         .channel-card:hover { box-shadow:0 8px 20px rgba(0,0,0,0.6); border-color:var(--accent-primary); }
         .channel-image { width:100%; height:100%; object-fit:cover; }
@@ -85,7 +85,7 @@
         @keyframes pulse { 0%,100%{opacity:1;} 50%{opacity:0.6;} }
         @keyframes loading { 0%{transform:translateX(-100%);} 100%{transform:translateX(350%);} }
         @keyframes spin { to{transform:translate(-50%,-50%) rotate(360deg);} }
-        @media(min-width:768px) { .channels { grid-template-columns:repeat(4,1fr); gap:14px; padding:12px 28px 40px; } }
+        @media(max-width:480px) { .channels { grid-template-columns:repeat(2,1fr); } }
     </style>
     <script src="//ssl.p.jwpcdn.com/player/v/8.26.0/jwplayer.js"></script>
     <script>jwplayer.key = "XSuP4qMl+9tK17QNb+4+th2Pm9AWgMO/cYH8CI0HGGr7bdjo";</script>
@@ -139,7 +139,10 @@
         </div>
         <div class="quality-popup" id="qualityPopup"></div>
     </div>
-    <nav class="categories" id="categoriesNav"></nav>
+    <div class="sport-header">
+        <span class="sport-text">القنوات الرياضية</span>
+        <img src="https://i.postimg.cc/dVNxgBLJ/20260603-150404.png" alt="Blue Sport Logo">
+    </div>
     <section class="channels" id="channelsGrid"></section>
     <div style="display:flex; justify-content:center; margin:20px 0;">
         <script>
@@ -159,7 +162,7 @@
     <div class="toast" id="toast"></div>
 
     <script>
-        let categories = [], allChannels = [], currentChannelId = null, jwPlayer = null;
+        let allChannels = [], currentChannelId = null, jwPlayer = null, currentChannel = null;
         const toast = document.getElementById('toast');
         let toastTimer;
         const loadingSpinner = document.getElementById('loadingSpinner');
@@ -191,71 +194,59 @@
             if (icon) icon.textContent = isFS ? 'fullscreen_exit' : 'fullscreen';
         }
 
-        // بناء قائمة الجودة من مستويات JW Player فقط
-        function buildQualityPopupFromLevels() {
+        function buildQualityPopup() {
             qualityPopup.innerHTML = '';
-            if (!jwPlayer) return;
-
-            const levels = jwPlayer.getQualityLevels ? jwPlayer.getQualityLevels() : [];
-            console.log('مستويات الجودة من JW Player:', levels); // للمراقبة
-
-            if (!levels || levels.length <= 1) {
+            if (!currentChannel || !currentChannel.servers || currentChannel.servers.length === 0) {
                 const item = document.createElement('div');
                 item.className = 'quality-item';
-                item.textContent = levels && levels.length === 1 ? 'جودة واحدة فقط' : 'جاري تحميل الجودات...';
+                item.textContent = 'لا توجد جودات متعددة';
                 item.style.color = 'var(--text-muted)';
                 item.style.cursor = 'default';
                 qualityPopup.appendChild(item);
-                // إعادة المحاولة بعد 2 ثانية
-                setTimeout(() => {
-                    if (jwPlayer) {
-                        const newLevels = jwPlayer.getQualityLevels ? jwPlayer.getQualityLevels() : [];
-                        if (newLevels && newLevels.length > 1) buildQualityPopupFromLevels();
-                    }
-                }, 2000);
                 return;
             }
 
-            // خيار تلقائي
-            const autoItem = document.createElement('div');
-            autoItem.className = 'quality-item';
-            autoItem.textContent = 'تلقائي';
-            autoItem.dataset.level = '-1';
-            autoItem.addEventListener('click', () => {
-                jwPlayer.setCurrentQuality(-1);
-                refreshQualityActive();
-                qualityPopup.classList.remove('active');
-            });
-            qualityPopup.appendChild(autoItem);
-
-            levels.forEach((level, index) => {
+            currentChannel.servers.forEach((server, index) => {
                 const item = document.createElement('div');
                 item.className = 'quality-item';
-                item.dataset.level = index;
-                item.textContent = level.label || (level.height ? `${level.height}p` : `جودة ${index+1}`);
+                item.textContent = server.label;
+                item.dataset.serverIndex = index;
+                if (jwPlayer) {
+                    const currentSrc = jwPlayer.getPlaylistItem ? jwPlayer.getPlaylistItem().file : null;
+                    if (currentSrc === server.url) item.classList.add('active');
+                }
                 item.addEventListener('click', () => {
-                    jwPlayer.setCurrentQuality(index);
-                    refreshQualityActive();
+                    switchQuality(index);
                     qualityPopup.classList.remove('active');
                 });
                 qualityPopup.appendChild(item);
             });
-
-            refreshQualityActive();
         }
 
-        function refreshQualityActive() {
-            const items = qualityPopup.querySelectorAll('.quality-item');
-            items.forEach(item => item.classList.remove('active'));
-            if (!jwPlayer) return;
-            const current = jwPlayer.getCurrentQuality();
-            if (current === -1) {
-                const auto = qualityPopup.querySelector('.quality-item[data-level="-1"]');
-                if (auto) auto.classList.add('active');
-            } else {
-                const match = qualityPopup.querySelector(`.quality-item[data-level="${current}"]`);
-                if (match) match.classList.add('active');
-            }
+        function switchQuality(serverIndex) {
+            if (!currentChannel || !currentChannel.servers[serverIndex] || !jwPlayer) return;
+            const server = currentChannel.servers[serverIndex];
+            loadingSpinner.classList.add('show');
+            jwPlayer.setup({
+                file: server.url,
+                type: 'hls',
+                width: '100%', height: '100%',
+                autostart: true, mute: jwPlayer.getMute(), volume: jwPlayer.getVolume(),
+                stretching: 'uniform', controls: false,
+                playbackRateControls: true,
+                playbackRates: [0.5, 1, 1.25, 1.5, 2],
+                hlsjs: {},
+                drm: {
+                    clearkey: {
+                        keyId: "b253c726c24c7c94a3ddf9b1907e2c76",
+                        key: "097963d6ad73c3d712a104981de0ed42"
+                    }
+                }
+            });
+            jwPlayer.on('play', () => loadingSpinner.classList.remove('show'));
+            jwPlayer.on('ready', () => loadingSpinner.classList.remove('show'));
+            jwPlayer.on('error', () => { loadingSpinner.classList.remove('show'); showToast('خطأ في تغيير الجودة', 'error'); });
+            buildQualityPopup(); // تحديث النشط
         }
 
         function checkDVRSupport() {
@@ -293,46 +284,31 @@
         }
 
         function playChannel(channel) {
-            if (!channel || !channel.stream_url) {
+            if (!channel || !channel.servers || channel.servers.length === 0) {
                 showToast('لا يوجد رابط بث للقناة', 'error');
                 return;
             }
-            const url = channel.stream_url;
-            const headers = channel.headers || [];
+            currentChannel = channel;
+            const defaultServer = channel.servers[0];
             if (!jwPlayer) jwPlayer = jwplayer("jwPlayerWrapper");
             loadingSpinner.classList.add('show');
 
-            // تكوين JW Player مع تفعيل hlsjs فارغ لضمان معالجة HLS
-            const cfg = {
-                file: url,
+            jwPlayer.setup({
+                file: defaultServer.url,
                 type: 'hls',
                 width: '100%', height: '100%',
                 autostart: true, mute: false, volume: 100,
                 stretching: 'uniform', controls: false,
                 playbackRateControls: true,
                 playbackRates: [0.5, 1, 1.25, 1.5, 2],
-                hlsjs: {}, // ضروري لتفعيل معالجة HLS الداخلية
+                hlsjs: {},
                 drm: {
                     clearkey: {
                         keyId: "b253c726c24c7c94a3ddf9b1907e2c76",
                         key: "097963d6ad73c3d712a104981de0ed42"
                     }
                 }
-            };
-            if (headers.length) {
-                cfg.hlsjs = {
-                    onXhrOpen: function(xhr) {
-                        headers.forEach(h => xhr.setRequestHeader(h.key, h.value));
-                    }
-                };
-            }
-            jwPlayer.setup(cfg);
-
-            jwPlayer.on('levels', () => {
-                console.log('تم استلام حدث levels');
-                buildQualityPopupFromLevels();
             });
-            jwPlayer.on('visualQuality', () => refreshQualityActive());
 
             jwPlayer.on('play', () => {
                 jwPlayer.setMute(false);
@@ -340,9 +316,7 @@
                 updatePlayIcon('pause');
                 loadingSpinner.classList.remove('show');
                 checkDVRSupport();
-                // محاولة بناء القائمة بعد قليل
-                setTimeout(buildQualityPopupFromLevels, 1000);
-                setTimeout(buildQualityPopupFromLevels, 3000);
+                buildQualityPopup();
             });
             jwPlayer.on('pause', () => updatePlayIcon('play'));
             jwPlayer.on('ready', () => {
@@ -350,8 +324,7 @@
                 jwPlayer.setMute(false);
                 loadingSpinner.classList.remove('show');
                 checkDVRSupport();
-                setTimeout(buildQualityPopupFromLevels, 1000);
-                setTimeout(buildQualityPopupFromLevels, 3000);
+                buildQualityPopup();
             });
             jwPlayer.on('error', e => {
                 console.error(e);
@@ -381,33 +354,9 @@
             }
         }
 
-        function renderCategories() {
-            const nav = document.getElementById('categoriesNav');
-            const active = new URLSearchParams(window.location.search).get('category') || 'all';
-            let html = `<div class="category ${active==='all'?'active':''}" data-id="all">الكل</div>`;
-            categories.forEach(c => {
-                html += `<div class="category ${active==c.id?'active':''}" data-id="${c.id}">${c.name}</div>`;
-            });
-            nav.innerHTML = html;
-            nav.querySelectorAll('.category').forEach(cat => {
-                cat.addEventListener('click', function() {
-                    const id = this.dataset.id;
-                    document.querySelectorAll('.category').forEach(c => c.classList.remove('active'));
-                    this.classList.add('active');
-                    const filtered = id === 'all' ? allChannels : allChannels.filter(ch => ch.category_id == id);
-                    renderChannels(filtered);
-                    history.pushState({}, '', id === 'all' ? 'index.html' : `?category=${id}`);
-                });
-            });
-        }
-
-        function renderChannels(channels) {
+        function renderChannels() {
             const grid = document.getElementById('channelsGrid');
-            if (!channels.length) {
-                grid.innerHTML = '<div style="grid-column:1/-1;text-align:center;padding:40px;color:var(--text-muted)">لا توجد قنوات</div>';
-                return;
-            }
-            grid.innerHTML = channels.map(ch => `
+            grid.innerHTML = allChannels.map(ch => `
                 <div class="channel-card" data-id="${ch.id}">
                     ${ch.is_active ? '<span class="channel-badge">مباشر</span>' : ''}
                     <img class="channel-image" src="${ch.logo_url || ''}" alt="${ch.name}">
@@ -423,16 +372,11 @@
                 const res = await fetch('data/api.json');
                 if (!res.ok) throw new Error('فشل تحميل البيانات');
                 const data = await res.json();
-                categories = data.categories;
-                allChannels = data.channels;
-                const params = new URLSearchParams(window.location.search);
-                const activeCategory = params.get('category') || 'all';
-                let currentChannels = activeCategory === 'all' ? [...allChannels] : allChannels.filter(ch => ch.category_id == activeCategory);
-                renderCategories();
-                renderChannels(currentChannels);
+                allChannels = data.channels || [];
+                renderChannels();
                 hideSplash();
-                if (currentChannels.length > 0) {
-                    setTimeout(() => playChannel(currentChannels[0]), 500);
+                if (allChannels.length > 0) {
+                    setTimeout(() => playChannel(allChannels[0]), 500);
                 }
             } catch (err) {
                 console.error(err);
@@ -442,10 +386,9 @@
         }
 
         function hideSplash() {
-            setTimeout(() => document.getElementById('splashScreen').classList.add('hidden'), 2000);
+            setTimeout(() => document.getElementById('splashScreen').classList.add('hidden'), 1500);
         }
 
-        // أزرار التحكم
         document.getElementById('playBtn').addEventListener('click', () => {
             if (jwPlayer) {
                 const state = jwPlayer.getState();
@@ -464,18 +407,9 @@
 
         qualityBtn.addEventListener('click', (e) => {
             e.stopPropagation();
-            if (!jwPlayer) return;
-            // إذا كانت القائمة فارغة أو تحتوي على "جاري تحميل"، حاول بنائها الآن
-            if (qualityPopup.children.length === 0 || 
-                qualityPopup.querySelector('.quality-item')?.textContent.includes('جاري تحميل')) {
-                buildQualityPopupFromLevels();
-            }
-            // إذا كان هناك أكثر من خيار واحد (تلقائي + جودة واحدة على الأقل)
-            if (qualityPopup.querySelectorAll('.quality-item').length > 1) {
-                qualityPopup.classList.toggle('active');
-            } else {
-                showToast('لا توجد جودات متعددة', 'info');
-            }
+            if (!currentChannel) return;
+            buildQualityPopup();
+            qualityPopup.classList.toggle('active');
         });
 
         document.addEventListener('click', (e) => {
@@ -510,7 +444,6 @@
 
         liveBtn.addEventListener('click', seekToLive);
 
-        // إخفاء تلقائي للتحكم
         let hideTimer;
         const ctrl = document.getElementById('customControls');
         function showControls() {
@@ -529,11 +462,9 @@
             }
         });
 
-        // اختصارات لوحة المفاتيح
         document.addEventListener('keydown', function(e) {
             if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') return;
             if (!jwPlayer) return;
-
             switch (e.key.toLowerCase()) {
                 case ' ': case 'k':
                     e.preventDefault();
@@ -562,23 +493,13 @@
                     updateMuteIcon(jwPlayer.getMute());
                     break;
                 case 'arrowleft':
-                    if (isDVR) {
-                        e.preventDefault();
-                        const pos = jwPlayer.getPosition();
-                        jwPlayer.seek(Math.max(0, pos - 10));
-                    }
+                    if (isDVR) { e.preventDefault(); const pos = jwPlayer.getPosition(); jwPlayer.seek(Math.max(0, pos - 10)); }
                     break;
                 case 'arrowright':
-                    if (isDVR) {
-                        e.preventDefault();
-                        const pos = jwPlayer.getPosition();
-                        const dur = jwPlayer.getDuration();
-                        if (dur && isFinite(dur)) jwPlayer.seek(Math.min(dur - 1, pos + 10));
-                    }
+                    if (isDVR) { e.preventDefault(); const dur = jwPlayer.getDuration(); if (dur && isFinite(dur)) jwPlayer.seek(Math.min(dur - 1, jwPlayer.getPosition() + 10)); }
                     break;
                 case 'l':
-                    e.preventDefault();
-                    seekToLive();
+                    e.preventDefault(); seekToLive();
                     break;
                 case 'escape':
                     if (document.fullscreenElement) document.exitFullscreen();
@@ -586,7 +507,6 @@
             }
         });
 
-        // البحث
         const searchInput = document.getElementById('searchInput');
         document.getElementById('searchToggle').addEventListener('click', () => {
             document.getElementById('searchBarContainer').classList.add('active');
@@ -605,24 +525,11 @@
             });
         }
 
-        // القائمة
         const menu = document.getElementById('menuOverlay');
-        document.getElementById('menuToggle').addEventListener('click', () => {
-            menu.classList.add('active');
-            document.body.style.overflow = 'hidden';
-        });
-        document.getElementById('menuCloseBtn').addEventListener('click', () => {
-            menu.classList.remove('active');
-            document.body.style.overflow = '';
-        });
-        menu.addEventListener('click', (e) => {
-            if (e.target === menu) {
-                menu.classList.remove('active');
-                document.body.style.overflow = '';
-            }
-        });
+        document.getElementById('menuToggle').addEventListener('click', () => { menu.classList.add('active'); document.body.style.overflow = 'hidden'; });
+        document.getElementById('menuCloseBtn').addEventListener('click', () => { menu.classList.remove('active'); document.body.style.overflow = ''; });
+        menu.addEventListener('click', (e) => { if (e.target === menu) { menu.classList.remove('active'); document.body.style.overflow = ''; } });
 
-        // النقر على القناة
         document.addEventListener('click', e => {
             const card = e.target.closest('.channel-card');
             if (!card) return;
