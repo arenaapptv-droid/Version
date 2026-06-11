@@ -1,0 +1,25 @@
+{
+  "channels": [
+    {
+      "id": 1,
+      "name": "Blue Sport 1",
+      "image": "https://i.postimg.cc/dVNxgBLJ/20260603-150404.png",
+      "streamUrl": "https://prod-fastly-eu-central-1.video.pscp.tv/Transcoding/v1/hls/adqwnKUWAbRb-KgQKN0S0hmoyzkFJOZE3flgiHgStB44ICsdEhpglGPQOrJ1oICHLRXjwAj_TJdFykOQvU574w/non_transcode/eu-central-1/periscope-replay-direct-prod-eu-central-1-public/master_dynamic_highlatency.m3u8?type=live",
+      "type": "hls"
+    },
+    {
+      "id": 2,
+      "name": "Blue Sport 2",
+      "image": "https://i.postimg.cc/dVNxgBLJ/20260603-150404.png",
+      "streamUrl": "https://prod-fastly-eu-central-1.video.pscp.tv/Transcoding/v1/hls/WsL3YYDwQfsnHhAAMVWpF1-vvrQhpPc2KnPxE5l6ajPGAIWhz4sfYgkPl6AFDJLeV2YGTS6q6I6ZvaH-5JOQ_Q/non_transcode/eu-central-1/periscope-replay-direct-prod-eu-central-1-public/master_dynamic_highlatency.m3u8?type=live",
+      "type": "hls"
+    },
+    {
+      "id": 3,
+      "name": "Blue Sport 3",
+      "image": "https://i.postimg.cc/dVNxgBLJ/20260603-150404.png",
+      "streamUrl": "https://prod-fastly-eu-central-1.video.pscp.tv/Transcoding/v1/hls/zfq92ig8udnwSPpjHX3Xqk7bo6RD_I_k9lVodK642fyTy38GSHlEGViwyohX4ry0UYI3GuVZQNkzF08uO0QAIg/non_transcode/eu-central-1/periscope-replay-direct-prod-eu-central-1-public/master_dynamic_highlatency.m3u8?type=live",
+      "type": "hls"
+    }
+  ]
+}
