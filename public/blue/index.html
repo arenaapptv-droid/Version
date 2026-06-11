@@ -162,7 +162,7 @@
             if (!currentChannel || !currentChannel.servers || currentChannel.servers.length === 0) {
                 const item = document.createElement('div');
                 item.className = 'quality-item';
-                item.textContent = 'لا توجد جودات متعددة';
+                item.textContent = 'لا توجد سيرفرات';
                 item.style.color = 'var(--text-muted)';
                 item.style.cursor = 'default';
                 qualityPopup.appendChild(item);
@@ -174,24 +174,25 @@
                 item.className = 'quality-item';
                 item.textContent = server.label;
                 item.dataset.serverIndex = index;
+                // تحديد النشط بناءً على الرابط الحالي
                 if (jwPlayer) {
                     const currentSrc = jwPlayer.getPlaylistItem ? jwPlayer.getPlaylistItem().file : null;
                     if (currentSrc === server.url) item.classList.add('active');
                 }
                 item.addEventListener('click', () => {
-                    switchQuality(index);
+                    switchServer(index);
                     qualityPopup.classList.remove('active');
                 });
                 qualityPopup.appendChild(item);
             });
         }
 
-        function switchQuality(serverIndex) {
+        function switchServer(serverIndex) {
             if (!currentChannel || !currentChannel.servers[serverIndex] || !jwPlayer) return;
             const server = currentChannel.servers[serverIndex];
             loadingSpinner.classList.add('show');
             
-            // استخدام load لتغيير المصدر بسلاسة دون إعادة تهيئة المشغل
+            // استخدام load لتغيير السيرفر بسلاسة
             jwPlayer.load({
                 file: server.url,
                 type: 'hls',
@@ -211,13 +212,13 @@
                 }
             });
             
-            // إخفاء مؤشر التحميل عند الجاهزية أو الخطأ
-            const onReadyOrError = () => loadingSpinner.classList.remove('show');
-            jwPlayer.on('ready', onReadyOrError);
-            jwPlayer.on('play', onReadyOrError);
-            jwPlayer.on('error', () => {
-                onReadyOrError();
-                showToast('خطأ في تغيير الجودة', 'error');
+            // إخفاء مؤشر التحميل عند الجاهزية
+            const hideSpinner = () => loadingSpinner.classList.remove('show');
+            jwPlayer.once('ready', hideSpinner);
+            jwPlayer.once('play', hideSpinner);
+            jwPlayer.once('error', () => {
+                hideSpinner();
+                showToast('خطأ في تغيير السيرفر', 'error');
             });
             
             buildQualityPopup();
@@ -263,7 +264,7 @@
                 return;
             }
             currentChannel = channel;
-            const defaultServer = channel.servers[0];
+            const defaultServer = channel.servers[0]; // أول سيرفر (AUTO)
             if (!jwPlayer) jwPlayer = jwplayer("jwPlayerWrapper");
             loadingSpinner.classList.add('show');
 
