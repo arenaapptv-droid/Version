@@ -7,7 +7,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons+Round" rel="stylesheet">
     <style>
-        /* نفس التصميم الأصلي بالكامل (لم نغير فيه أي شيء) */
+        /* التصميم الأصلي بالكامل */
         :root {
             --bg-primary: #030303;
             --bg-card: #161921;
@@ -51,7 +51,6 @@
             transition: background 0.3s;
         }
         header.scrolled { background: rgba(8, 10, 18, 0.9); box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3); }
-        .header-left { display: flex; align-items: center; }
         .header-logo { height: 40px; filter: drop-shadow(0 0 8px rgba(0, 85, 239, 0.5)); transition: filter 0.3s; }
         .header-logo:hover { filter: drop-shadow(0 0 14px rgba(0, 85, 239, 0.8)); }
         .icon-btn {
@@ -86,7 +85,9 @@
             transition: all 0.2s; border: 1px solid transparent;
             opacity: 0; transform: translateY(10px);
         }
-        .menu-overlay.active .menu-link { animation: fadeInUp 0.3s forwards; }
+        .menu-overlay.active .menu-link {
+            animation: fadeInUp 0.3s forwards;
+        }
         .menu-overlay.active .menu-link:nth-child(1) { animation-delay: 0.05s; }
         .menu-overlay.active .menu-link:nth-child(2) { animation-delay: 0.1s; }
         .menu-overlay.active .menu-link:nth-child(3) { animation-delay: 0.15s; }
@@ -121,7 +122,7 @@
         .channel-gradient { position: absolute; inset: 0; background: linear-gradient(to top, rgba(0, 0, 0, 0.8) 0%, rgba(0, 0, 0, 0.1) 50%, transparent 100%); pointer-events: none; }
         .channel-title { position: absolute; bottom: 12px; left: 10px; right: 10px; text-align: center; font-size: 14px; font-weight: 700; text-shadow: 0 2px 6px rgba(0, 0, 0, 0.7); }
 
-        /* ==== مشغل الفيديو من player.js ==== */
+        /* ==== عناصر المشغل (مطلوبة بواسطة player.js) ==== */
         .player-overlay { position: fixed; inset: 0; background: #000; z-index: 3000; display: flex; align-items: center; justify-content: center; opacity: 0; pointer-events: none; transition: opacity 0.3s; }
         .player-overlay.active { opacity: 1; pointer-events: auto; }
         .player-wrapper { width: 100%; height: 100%; position: relative; background: #000; overflow: hidden; }
@@ -268,7 +269,6 @@
 
     // ==================== جلب القنوات من api.json ====================
     let channels = [];
-
     async function loadChannelsFromAPI() {
         try {
             const response = await fetch('api.json');
@@ -299,17 +299,24 @@
                 const id = parseInt(card.dataset.id);
                 const channel = channels.find(c => c.id === id);
                 if (channel) {
+                    // إعداد المتغير العام الذي يقرأه player.js
                     window.CHANNEL_DATA = {
                         id: channel.id,
                         name: channel.name,
                         streamUrl: channel.streamUrl,
                         type: channel.type || 'hls'
                     };
+                    // إظهار الـ overlay
                     document.getElementById('playerOverlay').classList.add('active');
+                    // استدعاء دالة التشغيل في player.js (إذا كانت جاهزة)
                     if (typeof window.initPlayerFromGlobal === 'function') {
                         window.initPlayerFromGlobal();
                     } else {
-                        console.warn("player.js لم يتحمل بعد");
+                        // إذا لم تكن جاهزة بعد، ننتظر قليلاً ثم نحاول مرة أخرى
+                        setTimeout(() => {
+                            if (typeof window.initPlayerFromGlobal === 'function') window.initPlayerFromGlobal();
+                            else console.warn('player.js لم يتم تحميله بعد');
+                        }, 200);
                     }
                 }
             });
@@ -343,6 +350,7 @@
     });
 </script>
 
+<!-- تحميل مشغل Moody TV الخارجي -->
 <script src="player.js"></script>
 </body>
 </html>
