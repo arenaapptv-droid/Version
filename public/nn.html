@@ -207,6 +207,7 @@
                 return;
             }
             qualityLevels = levels;
+
             // Auto option
             const autoItem = document.createElement('div');
             autoItem.className = 'quality-item';
@@ -253,7 +254,6 @@
             if (!jwPlayer) return;
             try {
                 const duration = jwPlayer.getDuration();
-                // If duration is very large (> 0) and not Infinity, it might be DVR
                 if (duration > 0 && isFinite(duration) && duration > 10) {
                     isDVR = true;
                     liveBtn.classList.add('show');
@@ -265,18 +265,13 @@
                 isDVR = false;
                 liveBtn.classList.remove('show');
             }
-            // Update live edge status periodically
             setInterval(() => {
                 if (!jwPlayer || !isDVR) return;
                 const pos = jwPlayer.getPosition();
                 const dur = jwPlayer.getDuration();
                 if (dur && isFinite(dur)) {
                     isAtLiveEdge = (dur - pos) < 5;
-                    if (isAtLiveEdge) {
-                        liveBtn.style.background = 'var(--accent-primary)';
-                    } else {
-                        liveBtn.style.background = 'rgba(255,255,255,0.2)';
-                    }
+                    liveBtn.style.background = isAtLiveEdge ? 'var(--accent-primary)' : 'rgba(255,255,255,0.2)';
                 }
             }, 1000);
         }
@@ -323,12 +318,20 @@
             jwPlayer.on('levels', () => {
                 buildQualityPopup();
             });
+            jwPlayer.on('visualQuality', () => {
+                // Update active quality when it changes automatically
+                refreshQualityActive();
+            });
             jwPlayer.on('play', () => {
                 jwPlayer.setMute(false);
                 jwPlayer.setVolume(100);
                 updatePlayIcon('pause');
                 loadingSpinner.classList.remove('show');
                 checkDVRSupport();
+                // Ensure quality popup is built if levels available
+                if (jwPlayer.getQualityLevels() && jwPlayer.getQualityLevels().length > 1) {
+                    buildQualityPopup();
+                }
             });
             jwPlayer.on('pause', () => updatePlayIcon('play'));
             jwPlayer.on('ready', () => {
@@ -336,14 +339,14 @@
                 jwPlayer.setMute(false);
                 loadingSpinner.classList.remove('show');
                 checkDVRSupport();
+                if (jwPlayer.getQualityLevels() && jwPlayer.getQualityLevels().length > 1) {
+                    buildQualityPopup();
+                }
             });
             jwPlayer.on('error', e => {
                 console.error(e);
                 showToast('تعذر تشغيل البث', 'error_outline');
                 loadingSpinner.classList.remove('show');
-            });
-            jwPlayer.on('time', () => {
-                // could update progress bar here if we add one later
             });
             updatePlayIcon('pause');
             currentChannelId = channel.id;
@@ -454,6 +457,8 @@
                 showToast('لا توجد جودات متعددة', 'info');
                 return;
             }
+            // Refresh quality popup just in case
+            if (qualityPopup.children.length === 0) buildQualityPopup();
             qualityPopup.classList.toggle('active');
         });
 
@@ -508,7 +513,7 @@
             }
         });
 
-        // Keyboard shortcuts (DVR enabled)
+        // Keyboard shortcuts
         document.addEventListener('keydown', function(e) {
             if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') return;
             if (!jwPlayer) return;
