@@ -14,7 +14,7 @@
       "sort_order": 1,
       "servers": [1],
       "headers": [],
-      "stream_url": "https://prod-fastly-eu-central-1.video.pscp.tv:443/Transcoding/v1/hls/u1OJcSVOS5sHhSP_JBHQOxGkF9aF0nl-0xhPucg1Ng7p0g2yKtAIJyLoyVPoDH-JFs1X01yJGJSX3IHc5iP2uQ/transcode/eu-central-1/periscope-replay-direct-prod-eu-central-1-public/eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCIsInZlcnNpb24iOiIyIn0.eyJFbmNvZGVyU2V0dGluZyI6ImVuY29kZXJfc2V0dGluZ18xMDgwcDMwXzEwIiwiSGVpZ2h0IjoxMDgwLCJLYnBzIjo1NTAwLCJXaWR0aCI6MTkyMH0.OImMZabKYJ0cs9CnIapU-4aBk6KNBiJxi1hh-6l4BZ4/dynamic_highlatency.m3u8?type=live"
+      "stream_url": "https://prod-fastly-eu-central-1.video.pscp.tv/Transcoding/v1/hls/WsL3YYDwQfsnHhAAMVWpF1-vvrQhpPc2KnPxE5l6ajPGAIWhz4sfYgkPl6AFDJLeV2YGTS6q6I6ZvaH-5JOQ_Q/non_transcode/eu-central-1/periscope-replay-direct-prod-eu-central-1-public/master_dynamic_highlatency.m3u8?type=live"
     },
     {
       "id": 2,
