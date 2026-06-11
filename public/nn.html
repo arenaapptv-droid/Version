@@ -194,21 +194,39 @@
 
         function buildQualityPopup() {
             qualityPopup.innerHTML = '';
-            if (!jwPlayer || !jwPlayer.getQualityLevels) return;
-            const levels = jwPlayer.getQualityLevels();
+            if (!jwPlayer) return;
+
+            const levels = jwPlayer.getQualityLevels ? jwPlayer.getQualityLevels() : null;
             if (!levels || levels.length <= 1) {
-                const item = document.createElement('div');
-                item.className = 'quality-item';
-                item.textContent = 'جودة واحدة فقط';
-                item.style.color = 'var(--text-muted)';
-                item.style.cursor = 'default';
-                qualityPopup.appendChild(item);
+                // ربما لم يتم تحميل المستويات بعد، نحاول مرة أخرى بعد قليل
+                if (!levels || levels.length === 0) {
+                    const item = document.createElement('div');
+                    item.className = 'quality-item';
+                    item.textContent = 'جاري تحميل الجودات...';
+                    item.style.color = 'var(--text-muted)';
+                    item.style.cursor = 'default';
+                    qualityPopup.appendChild(item);
+                    // محاولة إعادة البناء بعد ثانية إذا لم تظهر
+                    setTimeout(() => {
+                        if (jwPlayer && jwPlayer.getQualityLevels && jwPlayer.getQualityLevels().length > 1) {
+                            buildQualityPopup();
+                        }
+                    }, 1000);
+                } else {
+                    const item = document.createElement('div');
+                    item.className = 'quality-item';
+                    item.textContent = 'جودة واحدة فقط';
+                    item.style.color = 'var(--text-muted)';
+                    item.style.cursor = 'default';
+                    qualityPopup.appendChild(item);
+                }
                 qualityLevels = [];
                 return;
             }
+
             qualityLevels = levels;
 
-            // Auto option
+            // خيار تلقائي
             const autoItem = document.createElement('div');
             autoItem.className = 'quality-item';
             autoItem.textContent = 'تلقائي';
@@ -233,6 +251,7 @@
                 });
                 qualityPopup.appendChild(item);
             });
+
             refreshQualityActive();
         }
 
@@ -315,11 +334,12 @@
                 };
             }
             jwPlayer.setup(cfg);
+
+            // إعادة بناء قائمة الجودة عند توفر المستويات
             jwPlayer.on('levels', () => {
                 buildQualityPopup();
             });
             jwPlayer.on('visualQuality', () => {
-                // Update active quality when it changes automatically
                 refreshQualityActive();
             });
             jwPlayer.on('play', () => {
@@ -328,10 +348,8 @@
                 updatePlayIcon('pause');
                 loadingSpinner.classList.remove('show');
                 checkDVRSupport();
-                // Ensure quality popup is built if levels available
-                if (jwPlayer.getQualityLevels() && jwPlayer.getQualityLevels().length > 1) {
-                    buildQualityPopup();
-                }
+                // تأخير بسيط لضمان تحميل المستويات
+                setTimeout(buildQualityPopup, 500);
             });
             jwPlayer.on('pause', () => updatePlayIcon('play'));
             jwPlayer.on('ready', () => {
@@ -339,15 +357,14 @@
                 jwPlayer.setMute(false);
                 loadingSpinner.classList.remove('show');
                 checkDVRSupport();
-                if (jwPlayer.getQualityLevels() && jwPlayer.getQualityLevels().length > 1) {
-                    buildQualityPopup();
-                }
+                setTimeout(buildQualityPopup, 500);
             });
             jwPlayer.on('error', e => {
                 console.error(e);
                 showToast('تعذر تشغيل البث', 'error_outline');
                 loadingSpinner.classList.remove('show');
             });
+
             updatePlayIcon('pause');
             currentChannelId = channel.id;
             updateActiveCard(channel.id);
@@ -434,7 +451,7 @@
             setTimeout(() => document.getElementById('splashScreen').classList.add('hidden'), 2000);
         }
 
-        // Control buttons
+        // أزرار التحكم
         document.getElementById('playBtn').addEventListener('click', () => {
             if (jwPlayer) {
                 const state = jwPlayer.getState();
@@ -453,12 +470,20 @@
 
         qualityBtn.addEventListener('click', (e) => {
             e.stopPropagation();
-            if (!jwPlayer || !jwPlayer.getQualityLevels || jwPlayer.getQualityLevels().length <= 1) {
+            if (!jwPlayer) return;
+
+            // إذا كانت القائمة غير مبنية أو تحتوي على رسالة "جاري التحميل"، نحاول البناء الآن
+            if (qualityPopup.children.length === 0 || qualityPopup.querySelector('.quality-item')?.textContent.includes('جاري تحميل')) {
+                buildQualityPopup();
+            }
+
+            // إذا كانت لا تزال لا تحتوي على جودات متعددة
+            const levels = jwPlayer.getQualityLevels ? jwPlayer.getQualityLevels() : null;
+            if (!levels || levels.length <= 1) {
                 showToast('لا توجد جودات متعددة', 'info');
                 return;
             }
-            // Refresh quality popup just in case
-            if (qualityPopup.children.length === 0) buildQualityPopup();
+
             qualityPopup.classList.toggle('active');
         });
 
@@ -494,7 +519,7 @@
 
         liveBtn.addEventListener('click', seekToLive);
 
-        // Auto-hide controls
+        // إخفاء تلقائي للتحكم
         let hideTimer;
         const ctrl = document.getElementById('customControls');
         function showControls() {
@@ -513,7 +538,7 @@
             }
         });
 
-        // Keyboard shortcuts
+        // اختصارات لوحة المفاتيح
         document.addEventListener('keydown', function(e) {
             if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') return;
             if (!jwPlayer) return;
@@ -571,7 +596,7 @@
             }
         });
 
-        // Search
+        // البحث
         const searchInput = document.getElementById('searchInput');
         document.getElementById('searchToggle').addEventListener('click', () => {
             document.getElementById('searchBarContainer').classList.add('active');
@@ -590,7 +615,7 @@
             });
         }
 
-        // Menu
+        // القائمة
         const menu = document.getElementById('menuOverlay');
         document.getElementById('menuToggle').addEventListener('click', () => {
             menu.classList.add('active');
@@ -607,7 +632,7 @@
             }
         });
 
-        // Channel click
+        // النقر على القناة
         document.addEventListener('click', e => {
             const card = e.target.closest('.channel-card');
             if (!card) return;
