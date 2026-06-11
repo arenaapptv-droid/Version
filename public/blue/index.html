@@ -174,7 +174,6 @@
                 item.className = 'quality-item';
                 item.textContent = server.label;
                 item.dataset.serverIndex = index;
-                // تحديد النشط بناءً على الرابط الحالي
                 if (jwPlayer) {
                     const currentSrc = jwPlayer.getPlaylistItem ? jwPlayer.getPlaylistItem().file : null;
                     if (currentSrc === server.url) item.classList.add('active');
@@ -188,17 +187,24 @@
         }
 
         function switchServer(serverIndex) {
-            if (!currentChannel || !currentChannel.servers[serverIndex] || !jwPlayer) return;
+            if (!currentChannel || !currentChannel.servers[serverIndex]) return;
             const server = currentChannel.servers[serverIndex];
             loadingSpinner.classList.add('show');
-            
-            // استخدام load لتغيير السيرفر بسلاسة
-            jwPlayer.load({
+
+            // إزالة المشغل الحالي وإعادة إنشائه
+            if (jwPlayer) {
+                jwPlayer.remove();
+            }
+
+            jwPlayer = jwplayer("jwPlayerWrapper");
+            jwPlayer.setup({
                 file: server.url,
                 type: 'hls',
+                width: '100%',
+                height: '100%',
                 autostart: true,
-                mute: jwPlayer.getMute(),
-                volume: jwPlayer.getVolume(),
+                mute: false,
+                volume: 100,
                 stretching: 'uniform',
                 controls: false,
                 playbackRateControls: true,
@@ -211,51 +217,20 @@
                     }
                 }
             });
-            
-            // إخفاء مؤشر التحميل عند الجاهزية
-            const hideSpinner = () => loadingSpinner.classList.remove('show');
-            jwPlayer.once('ready', hideSpinner);
-            jwPlayer.once('play', hideSpinner);
-            jwPlayer.once('error', () => {
-                hideSpinner();
+
+            jwPlayer.on('play', () => {
+                updatePlayIcon('pause');
+                loadingSpinner.classList.remove('show');
+                buildQualityPopup();
+            });
+            jwPlayer.on('ready', () => {
+                loadingSpinner.classList.remove('show');
+                buildQualityPopup();
+            });
+            jwPlayer.on('error', () => {
+                loadingSpinner.classList.remove('show');
                 showToast('خطأ في تغيير السيرفر', 'error');
             });
-            
-            buildQualityPopup();
-        }
-
-        function checkDVRSupport() {
-            if (!jwPlayer) return;
-            try {
-                const duration = jwPlayer.getDuration();
-                if (duration > 0 && isFinite(duration) && duration > 10) {
-                    isDVR = true;
-                    liveBtn.classList.add('show');
-                } else {
-                    isDVR = false;
-                    liveBtn.classList.remove('show');
-                }
-            } catch (e) {
-                isDVR = false;
-                liveBtn.classList.remove('show');
-            }
-            setInterval(() => {
-                if (!jwPlayer || !isDVR) return;
-                const pos = jwPlayer.getPosition();
-                const dur = jwPlayer.getDuration();
-                if (dur && isFinite(dur)) {
-                    isAtLiveEdge = (dur - pos) < 5;
-                    liveBtn.style.background = isAtLiveEdge ? 'var(--accent-primary)' : 'rgba(255,255,255,0.2)';
-                }
-            }, 1000);
-        }
-
-        function seekToLive() {
-            if (!jwPlayer || !isDVR) return;
-            const dur = jwPlayer.getDuration();
-            if (dur && isFinite(dur)) {
-                jwPlayer.seek(dur - 2);
-            }
         }
 
         function playChannel(channel) {
@@ -264,16 +239,23 @@
                 return;
             }
             currentChannel = channel;
-            const defaultServer = channel.servers[0]; // أول سيرفر (AUTO)
-            if (!jwPlayer) jwPlayer = jwplayer("jwPlayerWrapper");
+            const defaultServer = channel.servers[0];
+            if (jwPlayer) {
+                jwPlayer.remove();
+            }
+            jwPlayer = jwplayer("jwPlayerWrapper");
             loadingSpinner.classList.add('show');
 
             jwPlayer.setup({
                 file: defaultServer.url,
                 type: 'hls',
-                width: '100%', height: '100%',
-                autostart: true, mute: false, volume: 100,
-                stretching: 'uniform', controls: false,
+                width: '100%',
+                height: '100%',
+                autostart: true,
+                mute: false,
+                volume: 100,
+                stretching: 'uniform',
+                controls: false,
                 playbackRateControls: true,
                 playbackRates: [0.5, 1, 1.25, 1.5, 2],
                 hlsjs: {},
@@ -326,6 +308,40 @@
                 card.classList.add('playing');
                 const b = card.querySelector('.channel-badge');
                 if (b) b.style.display = 'block';
+            }
+        }
+
+        function checkDVRSupport() {
+            if (!jwPlayer) return;
+            try {
+                const duration = jwPlayer.getDuration();
+                if (duration > 0 && isFinite(duration) && duration > 10) {
+                    isDVR = true;
+                    liveBtn.classList.add('show');
+                } else {
+                    isDVR = false;
+                    liveBtn.classList.remove('show');
+                }
+            } catch (e) {
+                isDVR = false;
+                liveBtn.classList.remove('show');
+            }
+            setInterval(() => {
+                if (!jwPlayer || !isDVR) return;
+                const pos = jwPlayer.getPosition();
+                const dur = jwPlayer.getDuration();
+                if (dur && isFinite(dur)) {
+                    isAtLiveEdge = (dur - pos) < 5;
+                    liveBtn.style.background = isAtLiveEdge ? 'var(--accent-primary)' : 'rgba(255,255,255,0.2)';
+                }
+            }, 1000);
+        }
+
+        function seekToLive() {
+            if (!jwPlayer || !isDVR) return;
+            const dur = jwPlayer.getDuration();
+            if (dur && isFinite(dur)) {
+                jwPlayer.seek(dur - 2);
             }
         }
 
