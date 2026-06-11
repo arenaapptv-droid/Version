@@ -1,13 +1,10 @@
 {
-  "categories": [],
   "channels": [
     {
       "id": 1,
       "name": "BLUE SPORT 1",
       "logo_url": "https://i.postimg.cc/dVNxgBLJ/20260603-150404.png",
-      "category_id": null,
       "is_active": true,
-      "sort_order": 1,
       "servers": [
         { "label": "AUTO", "url": "https://prod-fastly-eu-central-1.video.pscp.tv/Transcoding/v1/hls/adqwnKUWAbRb-KgQKN0S0hmoyzkFJOZE3flgiHgStB44ICsdEhpglGPQOrJ1oICHLRXjwAj_TJdFykOQvU574w/non_transcode/eu-central-1/periscope-replay-direct-prod-eu-central-1-public/master_dynamic_highlatency.m3u8?type=live" },
         { "label": "1080p", "url": "https://prod-fastly-eu-central-1.video.pscp.tv:443/Transcoding/v1/hls/adqwnKUWAbRb-KgQKN0S0hmoyzkFJOZE3flgiHgStB44ICsdEhpglGPQOrJ1oICHLRXjwAj_TJdFykOQvU574w/transcode/eu-central-1/periscope-replay-direct-prod-eu-central-1-public/eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCIsInZlcnNpb24iOiIyIn0.eyJFbmNvZGVyU2V0dGluZyI6ImVuY29kZXJfc2V0dGluZ18xMDgwcDMwXzEwIiwiSGVpZ2h0IjoxMDgwLCJLYnBzIjo1NTAwLCJXaWR0aCI6MTkyMH0.OImMZabKYJ0cs9CnIapU-4aBk6KNBiJxi1hh-6l4BZ4/dynamic_highlatency.m3u8?type=live" },
@@ -20,22 +17,26 @@
       "id": 2,
       "name": "BLUE SPORT 2",
       "logo_url": "https://i.postimg.cc/dVNxgBLJ/20260603-150404.png",
-      "category_id": null,
       "is_active": true,
-      "sort_order": 2,
       "servers": [
-        { "label": "AUTO", "url": "https://prod-fastly-eu-west-3.video.pscp.tv:443/Transcoding/v1/hls/I5RCxRZg_FzzKOcchzcXUDNrrMCpaN1KPNmI_V1rcHqbg5aq6WjncSpIYNKt4Y8aLwhTzsuppq374qp_tZcvZQ/transcode/eu-west-3/periscope-replay-direct-prod-eu-west-3-public/eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCIsInZlcnNpb24iOiIyIn0.eyJFbmNvZGVyU2V0dGluZyI6ImVuY29kZXJfc2V0dGluZ18xMDgwcDMwXzEwIiwiSGVpZ2h0IjoxMDgwLCJLYnBzIjo1NTAwLCJXaWR0aCI6MTkyMH0.OImMZabKYJ0cs9CnIapU-4aBk6KNBiJxi1hh-6l4BZ4/dynamic_highlatency.m3u8?type=live" }
+        { "label": "AUTO", "url": "https://prod-fastly-eu-central-1.video.pscp.tv/Transcoding/v1/hls/WsL3YYDwQfsnHhAAMVWpF1-vvrQhpPc2KnPxE5l6ajPGAIWhz4sfYgkPl6AFDJLeV2YGTS6q6I6ZvaH-5JOQ_Q/non_transcode/eu-central-1/periscope-replay-direct-prod-eu-central-1-public/master_dynamic_highlatency.m3u8?type=live" },
+        { "label": "1080p", "url": "https://prod-fastly-eu-central-1.video.pscp.tv:443/Transcoding/v1/hls/WsL3YYDwQfsnHhAAMVWpF1-vvrQhpPc2KnPxE5l6ajPGAIWhz4sfYgkPl6AFDJLeV2YGTS6q6I6ZvaH-5JOQ_Q/transcode/eu-central-1/periscope-replay-direct-prod-eu-central-1-public/eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCIsInZlcnNpb24iOiIyIn0.eyJFbmNvZGVyU2V0dGluZyI6ImVuY29kZXJfc2V0dGluZ18xMDgwcDMwXzEwIiwiSGVpZ2h0IjoxMDgwLCJLYnBzIjo1NTAwLCJXaWR0aCI6MTkyMH0.OImMZabKYJ0cs9CnIapU-4aBk6KNBiJxi1hh-6l4BZ4/dynamic_highlatency.m3u8?type=live" },
+        { "label": "720p", "url": "https://prod-fastly-eu-central-1.video.pscp.tv:443/Transcoding/v1/hls/WsL3YYDwQfsnHhAAMVWpF1-vvrQhpPc2KnPxE5l6ajPGAIWhz4sfYgkPl6AFDJLeV2YGTS6q6I6ZvaH-5JOQ_Q/transcode/eu-central-1/periscope-replay-direct-prod-eu-central-1-public/eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCIsInZlcnNpb24iOiIyIn0.eyJFbmNvZGVyU2V0dGluZyI6ImVuY29kZXJfc2V0dGluZ183MjBwMzBfMTAiLCJIZWlnaHQiOjcyMCwiS2JwcyI6Mjc1MCwiV2lkdGgiOjEyODB9.ldktM4fCFRfkP4ZEBfZPKtlAUNAcTPkoz994YJAzWpE/dynamic_highlatency.m3u8?type=live" },
+        { "label": "480p", "url": "https://prod-fastly-eu-central-1.video.pscp.tv:443/Transcoding/v1/hls/WsL3YYDwQfsnHhAAMVWpF1-vvrQhpPc2KnPxE5l6ajPGAIWhz4sfYgkPl6AFDJLeV2YGTS6q6I6ZvaH-5JOQ_Q/transcode/eu-central-1/periscope-replay-direct-prod-eu-central-1-public/eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCIsInZlcnNpb24iOiIyIn0.eyJFbmNvZGVyU2V0dGluZyI6ImVuY29kZXJfc2V0dGluZ180ODBwMzBfMTAiLCJIZWlnaHQiOjQ4MCwiS2JwcyI6MTIwMCwiV2lkdGgiOjg0OH0.0LJi1usWbiPqp0QIcpq7Md5g1WxvJcPqVWNqsKw5nhA/dynamic_highlatency.m3u8?type=live" },
+        { "label": "360p", "url": "https://prod-fastly-eu-central-1.video.pscp.tv:443/Transcoding/v1/hls/WsL3YYDwQfsnHhAAMVWpF1-vvrQhpPc2KnPxE5l6ajPGAIWhz4sfYgkPl6AFDJLeV2YGTS6q6I6ZvaH-5JOQ_Q/transcode/eu-central-1/periscope-replay-direct-prod-eu-central-1-public/eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCIsInZlcnNpb24iOiIyIn0.eyJFbmNvZGVyU2V0dGluZyI6ImVuY29kZXJfc2V0dGluZ18zMjBwMzBfMTAiLCJIZWlnaHQiOjMyMCwiS2JwcyI6NjAwLCJUcmFuc2NvZGVBdWRpbyI6dHJ1ZSwiV2lkdGgiOjU2OH0.es_XpNv3J12hFXU4WrCwmH28GmToYAPDPdT_EjerHCU/dynamic_highlatency.m3u8?type=live" }
       ]
     },
     {
       "id": 3,
       "name": "BLUE SPORT 3",
       "logo_url": "https://i.postimg.cc/dVNxgBLJ/20260603-150404.png",
-      "category_id": null,
       "is_active": true,
-      "sort_order": 3,
       "servers": [
-        { "label": "AUTO", "url": "https://prod-fastly-eu-central-1.video.pscp.tv:443/Transcoding/v1/hls/r8LlNLxyvhtBZfY8veYuOKLEk892LIRiXvLRJ3M4QMKgMg2ekdHde81-9dAeoXtq2uguHm_x8MUYBk52ul-cQw/transcode/eu-central-1/periscope-replay-direct-prod-eu-central-1-public/eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCIsInZlcnNpb24iOiIyIn0.eyJFbmNvZGVyU2V0dGluZyI6ImVuY29kZXJfc2V0dGluZ18xMDgwcDMwXzEwIiwiSGVpZ2h0IjoxMDgwLCJLYnBzIjo1NTAwLCJXaWR0aCI6MTkyMH0.OImMZabKYJ0cs9CnIapU-4aBk6KNBiJxi1hh-6l4BZ4/dynamic_highlatency.m3u8?type=live" }
+        { "label": "AUTO", "url": "https://prod-fastly-eu-central-1.video.pscp.tv/Transcoding/v1/hls/zfIdmopej5G4pVw28bDU0A27WYGAHBYR3LseP17-gOlvp_Xy5dyoa66CTRyFf_KrwHHCBptHlmbqtmFezyO3AQ/non_transcode/eu-central-1/periscope-replay-direct-prod-eu-central-1-public/master_dynamic_delta.m3u8?type=live" },
+        { "label": "1080p", "url": "https://prod-fastly-eu-central-1.video.pscp.tv:443/Transcoding/v1/hls/zfIdmopej5G4pVw28bDU0A27WYGAHBYR3LseP17-gOlvp_Xy5dyoa66CTRyFf_KrwHHCBptHlmbqtmFezyO3AQ/transcode/eu-central-1/periscope-replay-direct-prod-eu-central-1-public/eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCIsInZlcnNpb24iOiIyIn0.eyJFbmNvZGVyU2V0dGluZyI6ImVuY29kZXJfc2V0dGluZ18xMDgwcDMwXzEwIiwiSGVpZ2h0IjoxMDgwLCJLYnBzIjo1NTAwLCJXaWR0aCI6MTkyMH0.OImMZabKYJ0cs9CnIapU-4aBk6KNBiJxi1hh-6l4BZ4/dynamic_delta.m3u8?type=live" },
+        { "label": "720p", "url": "https://prod-fastly-eu-central-1.video.pscp.tv:443/Transcoding/v1/hls/zfIdmopej5G4pVw28bDU0A27WYGAHBYR3LseP17-gOlvp_Xy5dyoa66CTRyFf_KrwHHCBptHlmbqtmFezyO3AQ/transcode/eu-central-1/periscope-replay-direct-prod-eu-central-1-public/eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCIsInZlcnNpb24iOiIyIn0.eyJFbmNvZGVyU2V0dGluZyI6ImVuY29kZXJfc2V0dGluZ183MjBwMzBfMTAiLCJIZWlnaHQiOjcyMCwiS2JwcyI6Mjc1MCwiV2lkdGgiOjEyODB9.ldktM4fCFRfkP4ZEBfZPKtlAUNAcTPkoz994YJAzWpE/dynamic_delta.m3u8?type=live" },
+        { "label": "480p", "url": "https://prod-fastly-eu-central-1.video.pscp.tv:443/Transcoding/v1/hls/zfIdmopej5G4pVw28bDU0A27WYGAHBYR3LseP17-gOlvp_Xy5dyoa66CTRyFf_KrwHHCBptHlmbqtmFezyO3AQ/transcode/eu-central-1/periscope-replay-direct-prod-eu-central-1-public/eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCIsInZlcnNpb24iOiIyIn0.eyJFbmNvZGVyU2V0dGluZyI6ImVuY29kZXJfc2V0dGluZ180ODBwMzBfMTAiLCJIZWlnaHQiOjQ4MCwiS2JwcyI6MTIwMCwiV2lkdGgiOjg0OH0.0LJi1usWbiPqp0QIcpq7Md5g1WxvJcPqVWNqsKw5nhA/dynamic_delta.m3u8?type=live" },
+        { "label": "360p", "url": "https://prod-fastly-eu-central-1.video.pscp.tv:443/Transcoding/v1/hls/zfIdmopej5G4pVw28bDU0A27WYGAHBYR3LseP17-gOlvp_Xy5dyoa66CTRyFf_KrwHHCBptHlmbqtmFezyO3AQ/transcode/eu-central-1/periscope-replay-direct-prod-eu-central-1-public/eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCIsInZlcnNpb24iOiIyIn0.eyJFbmNvZGVyU2V0dGluZyI6ImVuY29kZXJfc2V0dGluZ18zMjBwMzBfMTAiLCJIZWlnaHQiOjMyMCwiS2JwcyI6NjAwLCJUcmFuc2NvZGVBdWRpbyI6dHJ1ZSwiV2lkdGgiOjU2OH0.es_XpNv3J12hFXU4WrCwmH28GmToYAPDPdT_EjerHCU/dynamic_delta.m3u8?type=live" }
       ]
     }
   ]
