@@ -8,13 +8,9 @@
     <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons+Round" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.2.1/css/all.min.css">
-    <!-- Phosphor Icons (للأزرار الحديثة) -->
     <script src="https://unpkg.com/@phosphor-icons/web"></script>
-    <!-- مكتبات التشغيل -->
-    <script src="https://cdn.jsdelivr.net/npm/hls.js@latest"></script>
-    <script src="https://cdn.dashjs.org/latest/dash.all.min.js"></script>
     <style>
-        /* ========== تصميم الصفحة الأصلي (بدون تغيير) ========== */
+        /* ========== التصميم الأصلي للصفحة (بدون تغيير) ========== */
         :root {
             --bg-primary: #030303; --bg-secondary: #0F1117; --bg-card: #161921; --bg-elevated: #1E2130;
             --glass-bg: rgba(22, 25, 33, 0.7); --glass-border: rgba(255, 255, 255, 0.08);
@@ -23,7 +19,7 @@
             --radius: 12px; --radius-full: 9999px;
         }
         * { margin:0; padding:0; box-sizing:border-box; -webkit-tap-highlight-color:transparent; }
-        body { background:var(--bg-primary); font-family:'Cairo',sans-serif; color:var(--text-primary); overflow-x:hidden; min-height:100vh; -webkit-font-smoothing:antialiased; display:flex; flex-direction:column; }
+        body { background:var(--bg-primary); font-family:'Cairo',sans-serif; color:var(--text-primary); overflow-x:hidden; min-height:100vh; display:flex; flex-direction:column; }
         ::-webkit-scrollbar { width:4px; } ::-webkit-scrollbar-track { background:transparent; } ::-webkit-scrollbar-thumb { background:rgba(255,255,255,0.12); border-radius:4px; }
         
         /* splash screen */
@@ -33,23 +29,19 @@
         .splash-loader { width:70px; height:4px; background:rgba(255,255,255,0.1); border-radius:4px; margin:0 auto; overflow:hidden; }
         .splash-loader::after { content:''; display:block; width:30%; height:100%; background:var(--accent-primary); border-radius:4px; animation:loading 1.2s ease-in-out infinite; }
         
-        /* header & navigation */
         header { height:64px; padding:0 20px; display:flex; align-items:center; justify-content:space-between; position:sticky; top:0; z-index:1000; background:rgba(3,3,3,0.8); backdrop-filter:blur(24px); border-bottom:1px solid var(--glass-border); }
         .header-left, .header-right { width:48px; display:flex; align-items:center; } .header-left { justify-content:flex-start; } .header-right { justify-content:flex-end; }
         .header-center { flex:1; display:flex; align-items:center; justify-content:center; }
         .main-logo { height:36px; object-fit:contain; }
         .icon-btn { width:42px; height:42px; border:none; border-radius:var(--radius); background:var(--glass-bg); backdrop-filter:blur(8px); border:1px solid var(--glass-border); color:#fff; display:flex; align-items:center; justify-content:center; cursor:pointer; transition:0.2s; }
         .icon-btn:hover { background:rgba(255,255,255,0.12); }
-        .icon-btn .material-icons-round { font-size:22px; }
         
-        /* search bar */
         .search-bar-container { position:sticky; top:64px; z-index:999; background:rgba(3,3,3,0.9); backdrop-filter:blur(20px); padding:10px 20px; border-bottom:1px solid var(--glass-border); display:none; }
         .search-bar-container.active { display:block; }
         .search-bar { display:flex; align-items:center; gap:8px; background:rgba(255,255,255,0.05); border-radius:var(--radius-full); padding:6px 6px 6px 18px; border:1px solid rgba(255,255,255,0.1); }
         .search-bar input { flex:1; background:transparent; border:none; padding:10px 0; color:#fff; font-family:'Cairo'; font-size:15px; outline:none; }
         .search-bar .close-search { background:rgba(255,255,255,0.1); border:none; color:#fff; width:38px; height:38px; border-radius:50%; display:flex; align-items:center; justify-content:center; cursor:pointer; }
         
-        /* menu overlay */
         .menu-overlay { position:fixed; inset:0; background:rgba(3,3,3,0.95); backdrop-filter:blur(24px); z-index:2000; display:flex; align-items:center; justify-content:center; opacity:0; pointer-events:none; transition:opacity 0.4s; flex-direction:column; }
         .menu-overlay.active { opacity:1; pointer-events:auto; }
         .menu-close { position:absolute; top:24px; left:24px; background:rgba(255,255,255,0.1); border:none; border-radius:var(--radius); color:#fff; width:44px; height:44px; display:flex; align-items:center; justify-content:center; cursor:pointer; }
@@ -62,13 +54,12 @@
         .app-desc { font-size:13px; color:var(--text-secondary); margin-bottom:15px; }
         .download-btn { display:inline-flex; align-items:center; gap:8px; background:var(--accent-primary); color:#fff; padding:12px 24px; border-radius:var(--radius-full); text-decoration:none; font-weight:600; transition:opacity 0.2s; }
         
-        /* categories & channels */
         .categories { display:flex; gap:8px; overflow-x:auto; padding:20px 16px 8px; }
         .category { padding:10px 20px; border-radius:var(--radius); background:var(--bg-card); color:var(--text-secondary); font-size:14px; font-weight:600; white-space:nowrap; cursor:pointer; border:1px solid transparent; transition:0.2s; }
         .category.active { background:var(--accent-primary); color:#fff; }
         .channels { padding:8px 12px 30px; display:grid; grid-template-columns:repeat(2,1fr); gap:10px; }
-        .channel-card { position:relative; border-radius:var(--radius); overflow:hidden; background:var(--bg-card); cursor:pointer; box-shadow:0 4px 12px rgba(0,0,0,0.4); aspect-ratio:20/13; transition:box-shadow 0.2s, border-color 0.2s; border:1px solid transparent; }
-        .channel-card:hover { box-shadow:0 8px 20px rgba(0,0,0,0.6); border-color:var(--accent-primary); }
+        .channel-card { position:relative; border-radius:var(--radius); overflow:hidden; background:var(--bg-card); cursor:pointer; aspect-ratio:20/13; border:1px solid transparent; transition:0.2s; }
+        .channel-card:hover { border-color:var(--accent-primary); }
         .channel-image { width:100%; height:100%; object-fit:cover; }
         .channel-gradient { position:absolute; inset:0; background:linear-gradient(to top, rgba(0,0,0,0.8), transparent); }
         .channel-title { position:absolute; bottom:12px; left:12px; right:12px; text-align:center; font-size:14px; font-weight:700; }
@@ -82,7 +73,7 @@
         @keyframes loading { 0%{transform:translateX(-100%);} 100%{transform:translateX(350%);} }
         @media(min-width:768px) { .channels { grid-template-columns:repeat(4,1fr); gap:14px; padding:12px 28px 40px; } }
         
-        /* ========== تصميم المشغل الاحترافي الجديد (متوافق مع نمط الصفحة) ========== */
+        /* ========== تصميم المشغل المدمج مع JWPlayer (بدون تغيير في الشكل الأصلي) ========== */
         #playerContainer {
             width: 100%;
             aspect-ratio: 16/9;
@@ -90,68 +81,30 @@
             position: relative;
             overflow: hidden;
             border-bottom: 1px solid rgba(255,255,255,0.15);
-            font-family: 'Cairo', sans-serif;
         }
-        .player-wrapper {
+        #jwPlayerWrapper {
+            width: 100%;
+            height: 100%;
             position: relative;
-            width: 100%;
-            height: 100%;
-            background: #000;
         }
-        #videoPlayer {
-            width: 100%;
-            height: 100%;
-            object-fit: contain;
-            background: #000;
-        }
-        .player-loading, .player-error {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0,0,0,0.7);
-            backdrop-filter: blur(8px);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            flex-direction: column;
-            gap: 16px;
-            z-index: 20;
-            color: white;
-            font-weight: 500;
-        }
-        .player-loading .spinner {
-            width: 48px;
-            height: 48px;
-            border: 4px solid rgba(255,255,255,0.2);
-            border-top-color: var(--accent-primary);
-            border-radius: 50%;
-            animation: spin 0.8s linear infinite;
-        }
-        @keyframes spin { to { transform: rotate(360deg); } }
-        .player-error button {
-            background: var(--accent-primary);
-            border: none;
-            padding: 10px 24px;
-            border-radius: var(--radius-full);
-            color: white;
-            font-weight: bold;
-            cursor: pointer;
-            margin-top: 12px;
-        }
-        .player-controls {
+        /* إخفاء أزرار JWPlayer الافتراضية */
+        .jw-controlbar, .jw-overlay, .jw-title-primary { display: none !important; }
+        
+        /* شريط التحكم المخصص */
+        .custom-controls {
             position: absolute;
             bottom: 0;
             left: 0;
             right: 0;
             background: linear-gradient(to top, rgba(0,0,0,0.85), transparent);
             padding: 20px 16px 12px;
-            z-index: 25;
-            transition: opacity 0.3s;
+            z-index: 30;
+            transition: opacity 0.3s, transform 0.3s;
             opacity: 1;
+            font-family: 'Cairo', sans-serif;
+            direction: ltr;
         }
-        .player-wrapper.autohide .player-controls {
+        .player-wrapper.autohide .custom-controls {
             opacity: 0;
             pointer-events: none;
         }
@@ -162,18 +115,13 @@
             margin-bottom: 12px;
             direction: ltr;
         }
-        .player-progress-wrapper {
+        .progress-wrapper {
             flex: 1;
             height: 4px;
             background: rgba(255,255,255,0.2);
             border-radius: 4px;
             cursor: pointer;
             position: relative;
-        }
-        .player-progress-bar {
-            position: relative;
-            width: 100%;
-            height: 100%;
         }
         .progress-buffered {
             position: absolute;
@@ -202,7 +150,7 @@
             transition: opacity 0.2s;
             pointer-events: none;
         }
-        .player-progress-wrapper:hover .progress-handle {
+        .progress-wrapper:hover .progress-handle {
             opacity: 1;
         }
         .time-display {
@@ -226,7 +174,7 @@
             align-items: center;
             gap: 10px;
         }
-        .player-btn {
+        .ctrl-btn {
             background: rgba(255,255,255,0.1);
             border: none;
             width: 36px;
@@ -240,7 +188,7 @@
             transition: 0.2s;
             font-size: 20px;
         }
-        .player-btn:hover {
+        .ctrl-btn:hover {
             background: var(--accent-primary);
         }
         .volume-wrapper {
@@ -282,12 +230,12 @@
         }
         .quality-dropdown {
             position: absolute;
-            bottom: 60px;
+            bottom: 70px;
             right: 20px;
             background: #1e1e2f;
             border-radius: 12px;
             overflow: hidden;
-            z-index: 30;
+            z-index: 35;
             display: none;
             flex-direction: column;
             min-width: 120px;
@@ -325,42 +273,24 @@
             border-radius: 20px;
             margin-left: 8px;
         }
-        .ad-overlay {
+        #loadingSpinner {
             position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: black;
-            z-index: 40;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            flex-direction: column;
-        }
-        .ad-video {
-            width: 100%;
-            height: 100%;
-            object-fit: contain;
-        }
-        .ad-skip {
-            position: absolute;
-            bottom: 20px;
-            right: 20px;
-            background: rgba(0,0,0,0.8);
-            padding: 8px 16px;
-            border-radius: 30px;
-            color: white;
-            border: none;
-            cursor: pointer;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 48px;
+            height: 48px;
+            border: 4px solid rgba(255,255,255,0.2);
+            border-top-color: var(--accent-primary);
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+            z-index: 20;
             display: none;
         }
-        @media (max-width: 600px) {
-            .player-btn { width: 32px; height: 32px; font-size: 18px; }
-            .volume-slider { width: 50px; }
-            .actions-row { gap: 6px; }
-        }
+        @keyframes spin { to { transform: translate(-50%, -50%) rotate(360deg); } }
     </style>
+    <script src="//ssl.p.jwpcdn.com/player/v/8.26.0/jwplayer.js"></script>
+    <script>jwplayer.key = "XSuP4qMl+9tK17QNb+4+th2Pm9AWgMO/cYH8CI0HGGr7bdjo";</script>
 </head>
 <body>
     <div class="splash-screen" id="splashScreen">
@@ -394,53 +324,36 @@
         </div>
     </div>
     
-    <!-- حاوية المشغل الجديدة -->
     <div id="playerContainer">
-        <div class="player-wrapper" id="playerWrapper">
-            <video id="videoPlayer" preload="auto" playsinline></video>
-            <div class="player-loading" id="playerLoading" style="display: none;">
-                <div class="spinner"></div>
-                <span>جاري تحميل البث...</span>
-            </div>
-            <div class="player-error" id="playerError" style="display: none;">
-                <i class="ph ph-warning" style="font-size: 32px;"></i>
-                <span id="playerErrorText">حدث خطأ في البث</span>
-                <button onclick="window.retryCurrentStream && window.retryCurrentStream()">إعادة المحاولة</button>
-            </div>
-            <div class="player-controls" id="playerControls">
-                <div class="progress-row" id="progressRow" style="display: none;">
-                    <div class="player-progress-wrapper" id="progressWrapper">
-                        <div class="player-progress-bar">
-                            <div class="progress-buffered" id="progressBuffered"></div>
-                            <div class="progress-played" id="progressPlayed"></div>
-                            <div class="progress-handle" id="progressHandle"></div>
-                        </div>
-                    </div>
-                    <div class="time-display"><span id="currentTime">0:00</span> / <span id="totalTime">0:00</span></div>
+        <div id="jwPlayerWrapper"></div>
+        <div id="loadingSpinner"></div>
+        <!-- شريط التحكم المخصص -->
+        <div class="custom-controls" id="customControls">
+            <div class="progress-row" id="progressRow" style="display: none;">
+                <div class="progress-wrapper" id="progressWrapper">
+                    <div class="progress-buffered" id="progressBuffered"></div>
+                    <div class="progress-played" id="progressPlayed"></div>
+                    <div class="progress-handle" id="progressHandle"></div>
                 </div>
-                <div class="actions-row">
-                    <div class="left-actions">
-                        <button class="player-btn" id="btnPlayPause"><i class="ph-fill ph-play"></i></button>
-                        <div class="volume-wrapper">
-                            <button class="player-btn" id="btnMute"><i class="ph ph-speaker-high"></i></button>
-                            <input type="range" class="volume-slider" id="volumeSlider" min="0" max="1" step="0.05" value="1">
-                        </div>
-                        <button class="player-btn" id="btnFullscreen"><i class="ph ph-corners-out"></i></button>
-                        <button class="quality-pill" id="btnQuality">الجودة <i class="ph ph-caret-down"></i></button>
-                    </div>
-                    <div class="right-actions">
-                        <button class="live-badge" id="btnLive" style="display: none;">مباشر</button>
-                    </div>
-                </div>
+                <div class="time-display"><span id="currentTime">0:00</span> / <span id="totalTime">0:00</span></div>
             </div>
-            <div class="quality-dropdown" id="qualityDropdown"></div>
-            <div class="dynamic-title" id="dynamicTitleContainer"></div>
-            <!-- إعلانات البداية (اختياري) -->
-            <div class="ad-overlay" id="adOverlay" style="display: none;">
-                <video id="adVideo" class="ad-video" playsinline></video>
-                <button class="ad-skip" id="adSkip" onclick="skipAd()">تخطي الإعلان</button>
+            <div class="actions-row">
+                <div class="left-actions">
+                    <button class="ctrl-btn" id="playBtn"><i class="ph-fill ph-play"></i></button>
+                    <div class="volume-wrapper">
+                        <button class="ctrl-btn" id="muteBtn"><i class="ph ph-speaker-high"></i></button>
+                        <input type="range" class="volume-slider" id="volumeSlider" min="0" max="1" step="0.05" value="1">
+                    </div>
+                    <button class="ctrl-btn" id="fullscreenBtn"><i class="ph ph-corners-out"></i></button>
+                    <button class="quality-pill" id="qualityBtn">الجودة <i class="ph ph-caret-down"></i></button>
+                </div>
+                <div class="right-actions">
+                    <button class="live-badge" id="liveBtn" style="display: none;">مباشر</button>
+                </div>
             </div>
         </div>
+        <div class="quality-dropdown" id="qualityDropdown"></div>
+        <div class="dynamic-title" id="dynamicTitleContainer"></div>
     </div>
     
     <nav class="categories" id="categoriesNav"></nav>
@@ -453,51 +366,40 @@
     <div class="toast" id="toast"></div>
 
     <script>
-        // ==================== البيانات وإدارة القنوات (نفس الكود الأصلي مع تعديل بسيط) ====================
-        let categories = [], allChannels = [], currentChannelObj = null;
-        let hlsPlayer = null, dashPlayer = null;
-        let isDVR = false, isAtLiveEdge = true;
+        // ========== البيانات وإدارة القنوات ==========
+        let categories = [], allChannels = [], currentChannel = null;
+        let jwPlayer = null;
+        let isDVR = false;
         let controlsTimeout = null;
-        let adPlaying = false;
         
-        // عناصر المشغل
-        const video = document.getElementById('videoPlayer');
-        const playerWrapper = document.getElementById('playerWrapper');
-        const loadingEl = document.getElementById('playerLoading');
-        const errorEl = document.getElementById('playerError');
-        const errorText = document.getElementById('playerErrorText');
-        const controlsBar = document.getElementById('playerControls');
-        const btnPlayPause = document.getElementById('btnPlayPause');
-        const btnMute = document.getElementById('btnMute');
-        const btnFullscreen = document.getElementById('btnFullscreen');
-        const btnQuality = document.getElementById('btnQuality');
-        const btnLive = document.getElementById('btnLive');
-        const volumeSlider = document.getElementById('volumeSlider');
-        const progressWrapperDiv = document.getElementById('progressWrapper');
+        // عناصر التحكم
+        const playBtn = document.getElementById('playBtn');
+        const muteBtn = document.getElementById('muteBtn');
+        const fullscreenBtn = document.getElementById('fullscreenBtn');
+        const qualityBtn = document.getElementById('qualityBtn');
+        const liveBtn = document.getElementById('liveBtn');
+        const volumeSliderCtrl = document.getElementById('volumeSlider');
+        const progressWrapper = document.getElementById('progressWrapper');
         const progressPlayed = document.getElementById('progressPlayed');
         const progressBuffered = document.getElementById('progressBuffered');
         const progressHandle = document.getElementById('progressHandle');
-        const currentTimeEl = document.getElementById('currentTime');
-        const totalTimeEl = document.getElementById('totalTime');
+        const currentTimeSpan = document.getElementById('currentTime');
+        const totalTimeSpan = document.getElementById('totalTime');
+        const progressRowDiv = document.getElementById('progressRow');
         const qualityDropdown = document.getElementById('qualityDropdown');
-        const progressRow = document.getElementById('progressRow');
+        const loadingSpinner = document.getElementById('loadingSpinner');
+        const customControls = document.getElementById('customControls');
+        const playerContainer = document.getElementById('playerContainer');
         
         let isSeeking = false;
         
-        // إعدادات إعلانية معطلة (بدون اعلانات)
-        const ADS_CONFIG = { preroll: { enabled: false } };
-        
-        // Toast
-        const toast = document.getElementById('toast');
-        let toastTimer;
         function showToast(msg, icon='info') {
-            clearTimeout(toastTimer);
+            const toast = document.getElementById('toast');
             toast.innerHTML = `<span class="material-icons-round">${icon}</span> ${msg}`;
             toast.classList.add('show');
-            toastTimer = setTimeout(() => toast.classList.remove('show'), 2000);
+            setTimeout(() => toast.classList.remove('show'), 2500);
         }
         
-        // تحميل البيانات
         async function loadData() {
             try {
                 const res = await fetch('data/api.json');
@@ -510,162 +412,249 @@
                 let currentChannels = activeCategory === 'all' ? [...allChannels] : allChannels.filter(ch => ch.category_id == activeCategory);
                 renderCategories();
                 renderChannels(currentChannels);
-                hideSplash();
+                setTimeout(() => document.getElementById('splashScreen').classList.add('hidden'), 1500);
                 if (currentChannels.length > 0) {
-                    setTimeout(() => setupPlayerWithChannel(currentChannels[0]), 500);
+                    setTimeout(() => playChannel(currentChannels[0]), 500);
                 }
-            } catch (err) { console.error(err); showToast('فشل تحميل البيانات', 'error'); hideSplash(); }
-        }
-        function hideSplash() { setTimeout(() => document.getElementById('splashScreen').classList.add('hidden'), 2000); }
-        
-        // تشغيل القناة عبر المشغل الجديد
-        function setupPlayerWithChannel(channel) {
-            if (!channel || !channel.stream_url) { showToast('لا يوجد رابط بث', 'error'); return; }
-            currentChannelObj = channel;
-            // إعادة تعيين المشغل السابق
-            if (hlsPlayer) { hlsPlayer.destroy(); hlsPlayer = null; }
-            if (dashPlayer) { dashPlayer.reset(); dashPlayer = null; }
-            showLoading(true);
-            showError(false);
-            const url = channel.stream_url;
-            const type = channel.type || (url.includes('.mpd') ? 'dash' : 'hls');
-            
-            if (type === 'dash' || url.includes('.mpd')) {
-                initDash(url);
-            } else {
-                initHLS(url);
+            } catch (err) {
+                console.error(err);
+                showToast('فشل تحميل البيانات', 'error');
+                document.getElementById('splashScreen').classList.add('hidden');
             }
-            // تحديث البطاقة النشطة
+        }
+        
+        function playChannel(channel) {
+            if (!channel || !channel.stream_url) {
+                showToast('لا يوجد رابط بث', 'error');
+                return;
+            }
+            currentChannel = channel;
+            loadingSpinner.style.display = 'block';
+            
+            if (jwPlayer) {
+                jwPlayer.remove();
+                jwPlayer = null;
+            }
+            
+            const config = {
+                file: channel.stream_url,
+                type: channel.type === 'dash' ? 'dash' : 'hls',
+                width: '100%',
+                height: '100%',
+                autostart: true,
+                controls: false,
+                mute: false,
+                volume: 100,
+                stretching: 'uniform'
+            };
+            
+            if (channel.headers && channel.headers.length) {
+                config.hlsjs = { onXhrOpen: function(xhr) { channel.headers.forEach(h => xhr.setRequestHeader(h.key, h.value)); } };
+            }
+            
+            jwPlayer = jwplayer("jwPlayerWrapper");
+            jwPlayer.setup(config);
+            
+            jwPlayer.on('ready', () => {
+                loadingSpinner.style.display = 'none';
+                updatePlayPauseIcon(false);
+                jwPlayer.setVolume(volumeSliderCtrl.value * 100);
+                checkDVRSupport();
+                setupQualityMenu();
+            });
+            
+            jwPlayer.on('play', () => { loadingSpinner.style.display = 'none'; updatePlayPauseIcon(false); });
+            jwPlayer.on('pause', () => updatePlayPauseIcon(true));
+            jwPlayer.on('buffer', () => { loadingSpinner.style.display = 'block'; });
+            jwPlayer.on('error', (e) => { console.error(e); loadingSpinner.style.display = 'none'; showToast('خطأ في البث', 'error'); });
+            jwPlayer.on('time', (e) => updateProgress(e));
+            jwPlayer.on('levelsChanged', () => setupQualityMenu());
+            
             document.querySelectorAll('.channel-card').forEach(card => card.classList.remove('playing'));
             const activeCard = document.querySelector(`.channel-card[data-id="${channel.id}"]`);
             if(activeCard) activeCard.classList.add('playing');
         }
         
-        function initHLS(url) {
-            if (Hls.isSupported()) {
-                hlsPlayer = new Hls({ maxBufferLength: 60, liveSyncDurationCount: 2, enableWorker: true });
-                hlsPlayer.loadSource(url);
-                hlsPlayer.attachMedia(video);
-                hlsPlayer.on(Hls.Events.MANIFEST_PARSED, () => { showLoading(false); playVideo(); checkDVRSupport(); setupQualityLevels(); });
-                hlsPlayer.on(Hls.Events.ERROR, (e, data) => { if (data.fatal) { showError(true, 'خطأ في البث'); showLoading(false); } });
-                hlsPlayer.on(Hls.Events.LEVEL_SWITCHED, () => {});
-            } else if (video.canPlayType('application/vnd.apple.mpegurl')) {
-                video.src = url;
-                video.addEventListener('loadedmetadata', () => { showLoading(false); playVideo(); checkDVRSupport(); });
-            } else { showError(true, 'المتصفح لا يدعم HLS'); }
+        function updatePlayPauseIcon(isPaused) {
+            playBtn.innerHTML = isPaused ? '<i class="ph-fill ph-play"></i>' : '<i class="ph-fill ph-pause"></i>';
         }
         
-        function initDash(url) {
-            if (dashjs && dashjs.MediaPlayer) {
-                dashPlayer = dashjs.MediaPlayer().create();
-                dashPlayer.initialize(video, url, false);
-                dashPlayer.updateSettings({ streaming: { buffer: { fastSwitchEnabled: true } } });
-                dashPlayer.on(dashjs.MediaPlayer.events.STREAM_INITIALIZED, () => { showLoading(false); playVideo(); checkDVRSupport(); setupDashQualities(); });
-                dashPlayer.on(dashjs.MediaPlayer.events.ERROR, () => { showError(true, 'خطأ DASH'); });
-            } else { showError(true, 'DASH غير مدعوم'); }
+        function updateProgress(event) {
+            if (!jwPlayer) return;
+            const duration = jwPlayer.getDuration();
+            const position = event.position;
+            if (duration && !isNaN(duration) && duration > 0) {
+                const percent = (position / duration) * 100;
+                progressPlayed.style.width = percent + '%';
+                progressHandle.style.left = percent + '%';
+                currentTimeSpan.textContent = formatTime(position);
+                totalTimeSpan.textContent = formatTime(duration);
+            }
+            // تحديث التقدم المُحمّل
+            const bufferPercent = jwPlayer.getBuffer() * 100;
+            progressBuffered.style.width = bufferPercent + '%';
         }
         
-        function setupQualityLevels() {
-            if (!hlsPlayer || !qualityDropdown) return;
-            const levels = hlsPlayer.levels;
-            if (!levels || levels.length <= 1) return;
+        function checkDVRSupport() {
+            if (!jwPlayer) return;
+            const seekRange = jwPlayer.getSeekRange();
+            if (seekRange && seekRange.duration > 10) {
+                isDVR = true;
+                progressRowDiv.style.display = 'flex';
+                liveBtn.style.display = 'inline-flex';
+                // تحديث الوضع live
+                const currentPos = jwPlayer.getPosition();
+                const isAtLive = (seekRange.duration - (currentPos - seekRange.start)) < 5;
+                liveBtn.classList.toggle('is-live', isAtLive);
+                liveBtn.innerHTML = isAtLive ? 'مباشر' : 'العودة للبث';
+            } else {
+                isDVR = false;
+                progressRowDiv.style.display = 'none';
+                liveBtn.style.display = 'none';
+            }
+        }
+        
+        function setupQualityMenu() {
+            if (!jwPlayer) return;
+            const levels = jwPlayer.getQualityLevels();
+            if (!levels || levels.length <= 1) {
+                qualityBtn.style.opacity = '0.5';
+                qualityBtn.style.pointerEvents = 'none';
+                return;
+            }
+            qualityBtn.style.opacity = '1';
+            qualityBtn.style.pointerEvents = 'auto';
             let html = '<button class="quality-option active" data-level="-1">تلقائي</button>';
-            levels.forEach((lvl, idx) => {
-                let label = (lvl.height ? lvl.height+'p' : 'جودة '+(idx+1));
+            levels.forEach((level, idx) => {
+                let label = level.label || (level.height ? `${level.height}p` : `جودة ${idx+1}`);
                 html += `<button class="quality-option" data-level="${idx}">${label}</button>`;
             });
             qualityDropdown.innerHTML = html;
+            const currentIdx = jwPlayer.getCurrentQuality();
+            const options = qualityDropdown.querySelectorAll('.quality-option');
+            if (options[currentIdx+1]) options[currentIdx+1].classList.add('active');
+            else options[0].classList.add('active');
+            
             qualityDropdown.querySelectorAll('.quality-option').forEach(btn => {
-                btn.addEventListener('click', () => {
-                    let level = parseInt(btn.dataset.level);
-                    hlsPlayer.currentLevel = level;
-                    qualityDropdown.querySelectorAll('.quality-option').forEach(o => o.classList.remove('active'));
-                    btn.classList.add('active');
+                btn.addEventListener('click', (e) => {
+                    const level = parseInt(btn.dataset.level);
+                    jwPlayer.setCurrentQuality(level);
                     qualityDropdown.style.display = 'none';
                 });
             });
         }
-        function setupDashQualities() { /* تبسيط */ }
         
-        function checkDVRSupport() {
-            video.addEventListener('timeupdate', function() {
-                if (video.seekable && video.seekable.length > 0) {
-                    const end = video.seekable.end(0);
-                    const start = video.seekable.start(0);
-                    if (end - start > 15) {
-                        if (!isDVR) { isDVR = true; progressRow.style.display = 'flex'; btnLive.style.display = 'inline-flex'; }
-                        updateDVRProgress();
-                    } else { if(isDVR){ isDVR=false; progressRow.style.display='none'; } }
+        function seekToLive() {
+            if (jwPlayer && isDVR) {
+                const seekRange = jwPlayer.getSeekRange();
+                if (seekRange) {
+                    jwPlayer.seek(seekRange.duration - 2);
+                    liveBtn.classList.add('is-live');
+                    liveBtn.innerHTML = 'مباشر';
                 }
-            });
+            }
         }
-        function updateDVRProgress() {
-            if (!isDVR || !video.seekable || video.seekable.length===0) return;
-            const start = video.seekable.start(0), end = video.seekable.end(0), duration = end - start;
-            let percent = ((video.currentTime - start)/duration)*100;
-            percent = Math.min(100, Math.max(0, percent));
-            progressPlayed.style.width = percent+'%';
-            if(progressHandle) progressHandle.style.left = percent+'%';
-            isAtLiveEdge = (end - video.currentTime) < 5;
-            btnLive.classList.toggle('is-live', isAtLiveEdge);
-            btnLive.innerHTML = isAtLiveEdge ? 'مباشر' : 'العودة للبث';
-            currentTimeEl.textContent = formatTime(video.currentTime - start);
-            totalTimeEl.textContent = formatTime(duration);
-            updateBuffered();
-        }
-        function updateBuffered() {
-            if(!isDVR || !video.buffered.length) return;
-            const start = video.seekable.start(0), duration = video.seekable.end(0)-start;
-            const buffEnd = video.buffered.end(video.buffered.length-1);
-            let percent = ((buffEnd - start)/duration)*100;
-            progressBuffered.style.width = Math.min(100,percent)+'%';
-        }
-        function seekToLive() { if(video.seekable && video.seekable.length) video.currentTime = Math.max(video.seekable.end(0)-2, video.seekable.start(0)); }
         
-        // التحكم
-        function playVideo() { video.play().catch(e=>{ console.log('autoplay',e); video.muted=true; video.play(); }); }
-        function togglePlay() { video.paused ? playVideo() : video.pause(); }
-        function updateMuteUI() { 
-            let vol = video.muted ? 0 : video.volume;
-            btnMute.innerHTML = video.muted || vol===0 ? '<i class="ph ph-speaker-slash"></i>' : (vol<0.5 ? '<i class="ph ph-speaker-low"></i>' : '<i class="ph ph-speaker-high"></i>');
-            volumeSlider.value = video.muted ? 0 : video.volume;
-        }
-        function toggleFullscreen() {
-            if (!document.fullscreenElement) playerWrapper.requestFullscreen?.() || video.webkitEnterFullscreen?.();
-            else document.exitFullscreen?.();
-        }
-        function showControls() { playerWrapper.classList.remove('autohide'); clearTimeout(controlsTimeout); if (!video.paused) controlsTimeout = setTimeout(() => playerWrapper.classList.add('autohide'), 3000); }
+        // أحداث التحكم المخصصة
+        playBtn.addEventListener('click', () => {
+            if (!jwPlayer) return;
+            if (jwPlayer.getState() === 'playing') jwPlayer.pause();
+            else jwPlayer.play();
+        });
         
-        video.addEventListener('play', () => { btnPlayPause.innerHTML = '<i class="ph-fill ph-pause"></i>'; showControls(); });
-        video.addEventListener('pause', () => btnPlayPause.innerHTML = '<i class="ph-fill ph-play"></i>');
-        video.addEventListener('waiting', () => showLoading(true));
-        video.addEventListener('playing', () => showLoading(false));
-        video.addEventListener('volumechange', updateMuteUI);
-        volumeSlider.addEventListener('input', (e) => { video.volume = parseFloat(e.target.value); video.muted = false; updateMuteUI(); });
-        btnPlayPause.addEventListener('click', togglePlay);
-        btnMute.addEventListener('click', () => { video.muted = !video.muted; updateMuteUI(); });
-        btnFullscreen.addEventListener('click', toggleFullscreen);
-        btnLive.addEventListener('click', seekToLive);
-        btnQuality.addEventListener('click', (e) => { e.stopPropagation(); qualityDropdown.style.display = qualityDropdown.style.display==='none' ? 'flex' : 'none'; });
+        muteBtn.addEventListener('click', () => {
+            if (!jwPlayer) return;
+            const isMuted = jwPlayer.getMute();
+            jwPlayer.setMute(!isMuted);
+            muteBtn.innerHTML = !isMuted ? '<i class="ph ph-speaker-slash"></i>' : '<i class="ph ph-speaker-high"></i>';
+        });
+        
+        volumeSliderCtrl.addEventListener('input', (e) => {
+            if (!jwPlayer) return;
+            const val = parseFloat(e.target.value);
+            jwPlayer.setVolume(val * 100);
+            if (val === 0) muteBtn.innerHTML = '<i class="ph ph-speaker-slash"></i>';
+            else muteBtn.innerHTML = '<i class="ph ph-speaker-high"></i>';
+        });
+        
+        fullscreenBtn.addEventListener('click', () => {
+            if (!document.fullscreenElement) {
+                playerContainer.requestFullscreen().catch(() => showToast('تعذر ملء الشاشة', 'error'));
+            } else {
+                document.exitFullscreen();
+            }
+        });
+        document.addEventListener('fullscreenchange', () => {
+            fullscreenBtn.innerHTML = document.fullscreenElement ? '<i class="ph ph-corners-in"></i>' : '<i class="ph ph-corners-out"></i>';
+        });
+        
+        qualityBtn.addEventListener('click', (e) => {
+            e.stopPropagation();
+            qualityDropdown.style.display = qualityDropdown.style.display === 'none' ? 'flex' : 'none';
+        });
         document.addEventListener('click', () => qualityDropdown.style.display = 'none');
-        if(progressWrapperDiv) progressWrapperDiv.addEventListener('mousedown', (e) => { if(isDVR){ isSeeking=true; seekFromEvent(e); } });
-        document.addEventListener('mousemove', (e) => { if(isSeeking && isDVR) seekFromEvent(e); });
-        document.addEventListener('mouseup', () => isSeeking=false);
-        function seekFromEvent(e) { if(!video.seekable.length) return; const rect = progressWrapperDiv.getBoundingClientRect(); let percent = (e.clientX - rect.left)/rect.width; percent = Math.min(1,Math.max(0,percent)); const start = video.seekable.start(0), end = video.seekable.end(0); video.currentTime = start + percent*(end-start); }
-        playerWrapper.addEventListener('mousemove', showControls);
-        playerWrapper.addEventListener('touchstart', showControls);
-        window.retryCurrentStream = () => { if(currentChannelObj) setupPlayerWithChannel(currentChannelObj); };
         
-        function showLoading(show) { loadingEl.style.display = show ? 'flex' : 'none'; }
-        function showError(show, msg='') { errorEl.style.display = show ? 'flex' : 'none'; if(msg) errorText.innerText = msg; }
-        function formatTime(sec) { sec = Math.abs(Math.round(sec)); let m = Math.floor(sec/60), s = sec%60; return `${m}:${s.toString().padStart(2,'0')}`; }
+        liveBtn.addEventListener('click', seekToLive);
         
-        // تصيير القنوات والتصنيفات
+        // شريط التقدم
+        if (progressWrapper) {
+            progressWrapper.addEventListener('mousedown', (e) => {
+                if (!isDVR) return;
+                isSeeking = true;
+                seekFromEvent(e);
+            });
+            document.addEventListener('mousemove', (e) => { if (isSeeking && isDVR) seekFromEvent(e); });
+            document.addEventListener('mouseup', () => isSeeking = false);
+            progressWrapper.addEventListener('touchstart', (e) => { isSeeking = true; seekFromEvent(e.touches[0]); });
+            document.addEventListener('touchmove', (e) => { if (isSeeking && isDVR) seekFromEvent(e.touches[0]); });
+            document.addEventListener('touchend', () => isSeeking = false);
+            
+            function seekFromEvent(e) {
+                if (!jwPlayer || !isDVR) return;
+                const rect = progressWrapper.getBoundingClientRect();
+                let percent = (e.clientX - rect.left) / rect.width;
+                percent = Math.min(1, Math.max(0, percent));
+                const seekRange = jwPlayer.getSeekRange();
+                if (seekRange) {
+                    const seekTime = seekRange.start + (percent * seekRange.duration);
+                    jwPlayer.seek(seekTime);
+                }
+            }
+        }
+        
+        // إخفاء وإظهار الأزرار تلقائياً
+        function showControls() {
+            playerContainer.classList.remove('autohide');
+            clearTimeout(controlsTimeout);
+            if (jwPlayer && jwPlayer.getState() === 'playing') {
+                controlsTimeout = setTimeout(() => playerContainer.classList.add('autohide'), 3000);
+            }
+        }
+        playerContainer.addEventListener('mousemove', showControls);
+        playerContainer.addEventListener('touchstart', showControls);
+        customControls.addEventListener('mouseenter', () => clearTimeout(controlsTimeout));
+        customControls.addEventListener('mouseleave', () => {
+            if (jwPlayer && jwPlayer.getState() === 'playing')
+                controlsTimeout = setTimeout(() => playerContainer.classList.add('autohide'), 1500);
+        });
+        
+        function formatTime(sec) {
+            sec = Math.abs(Math.round(sec));
+            let h = Math.floor(sec / 3600);
+            let m = Math.floor((sec % 3600) / 60);
+            let s = sec % 60;
+            if (h > 0) return `${h}:${m.toString().padStart(2,'0')}:${s.toString().padStart(2,'0')}`;
+            return `${m}:${s.toString().padStart(2,'0')}`;
+        }
+        
+        // تصيير القنوات والفئات
         function renderCategories() {
             const nav = document.getElementById('categoriesNav');
-            const active = new URLSearchParams(window.location.search).get('category') || 'all';
-            let html = `<div class="category ${active==='all'?'active':''}" data-id="all">الكل</div>`;
-            categories.forEach(c => { html += `<div class="category ${active==c.id?'active':''}" data-id="${c.id}">${c.name}</div>`; });
+            const activeCat = new URLSearchParams(window.location.search).get('category') || 'all';
+            let html = `<div class="category ${activeCat==='all'?'active':''}" data-id="all">الكل</div>`;
+            categories.forEach(c => {
+                html += `<div class="category ${activeCat==c.id?'active':''}" data-id="${c.id}">${c.name}</div>`;
+            });
             nav.innerHTML = html;
             nav.querySelectorAll('.category').forEach(cat => {
                 cat.addEventListener('click', function() {
@@ -678,28 +667,62 @@
                 });
             });
         }
+        
         function renderChannels(channels) {
             const grid = document.getElementById('channelsGrid');
-            if (!channels.length) { grid.innerHTML = '<div style="grid-column:1/-1;text-align:center;padding:40px;color:var(--text-muted)">لا توجد قنوات</div>'; return; }
-            grid.innerHTML = channels.map(ch => `<div class="channel-card" data-id="${ch.id}">${ch.is_active ? '<span class="channel-badge">مباشر</span>' : ''}<img class="channel-image" src="${ch.logo_url || ''}" alt="${ch.name}"><div class="channel-gradient"></div><div class="channel-title">${ch.name}</div></div>`).join('');
-            if(currentChannelObj) document.querySelector(`.channel-card[data-id="${currentChannelObj.id}"]`)?.classList.add('playing');
+            if (!channels.length) {
+                grid.innerHTML = '<div style="grid-column:1/-1;text-align:center;padding:40px;color:var(--text-muted)">لا توجد قنوات</div>';
+                return;
+            }
+            grid.innerHTML = channels.map(ch => `
+                <div class="channel-card" data-id="${ch.id}">
+                    ${ch.is_active ? '<span class="channel-badge">مباشر</span>' : ''}
+                    <img class="channel-image" src="${ch.logo_url || ''}" alt="${ch.name}">
+                    <div class="channel-gradient"></div>
+                    <div class="channel-title">${ch.name}</div>
+                </div>
+            `).join('');
+            if (currentChannel) {
+                const activeCard = document.querySelector(`.channel-card[data-id="${currentChannel.id}"]`);
+                if(activeCard) activeCard.classList.add('playing');
+            }
         }
-        document.addEventListener('click', e => { const card = e.target.closest('.channel-card'); if(card){ const id = parseInt(card.dataset.id); const ch = allChannels.find(c=>c.id===id); if(ch) setupPlayerWithChannel(ch); } });
         
-        // بحث
+        document.addEventListener('click', e => {
+            const card = e.target.closest('.channel-card');
+            if (card) {
+                const id = parseInt(card.dataset.id);
+                const channel = allChannels.find(ch => ch.id === id);
+                if (channel) playChannel(channel);
+            }
+        });
+        
+        // البحث
         const searchInput = document.getElementById('searchInput');
-        document.getElementById('searchToggle').addEventListener('click', () => { document.getElementById('searchBarContainer').classList.add('active'); searchInput.focus(); });
-        document.getElementById('closeSearchBtn').addEventListener('click', () => { document.getElementById('searchBarContainer').classList.remove('active'); searchInput.value = ''; filterChannelsByName(''); });
+        document.getElementById('searchToggle').addEventListener('click', () => {
+            document.getElementById('searchBarContainer').classList.add('active');
+            searchInput.focus();
+        });
+        document.getElementById('closeSearchBtn').addEventListener('click', () => {
+            document.getElementById('searchBarContainer').classList.remove('active');
+            searchInput.value = '';
+            filterChannelsByName('');
+        });
         searchInput.addEventListener('input', e => filterChannelsByName(e.target.value));
-        function filterChannelsByName(term) { document.querySelectorAll('.channel-card').forEach(card => { const t = card.querySelector('.channel-title')?.textContent.toLowerCase() || ''; card.style.opacity = t.includes(term.toLowerCase()) ? '1' : '0.2'; }); }
+        function filterChannelsByName(term) {
+            document.querySelectorAll('.channel-card').forEach(card => {
+                const title = card.querySelector('.channel-title')?.textContent.toLowerCase() || '';
+                card.style.opacity = title.includes(term.toLowerCase()) ? '1' : '0.3';
+            });
+        }
         
-        // منيو
+        // قائمة جانبية
         const menu = document.getElementById('menuOverlay');
         document.getElementById('menuToggle').addEventListener('click', () => { menu.classList.add('active'); document.body.style.overflow = 'hidden'; });
         document.getElementById('menuCloseBtn').addEventListener('click', () => { menu.classList.remove('active'); document.body.style.overflow = ''; });
         menu.addEventListener('click', (e) => { if (e.target === menu) { menu.classList.remove('active'); document.body.style.overflow = ''; } });
         
-        document.addEventListener('DOMContentLoaded', loadData);
+        loadData();
     </script>
 </body>
 </html>
