@@ -25,13 +25,15 @@
     const volumeSlider = document.getElementById('volumeSlider');
 
     const progressWrapper = document.getElementById('progressWrapper');
-    const progressBar = document.getElementById('progressBar');
     const progressPlayed = document.getElementById('progressPlayed');
     const progressBuffered = document.getElementById('progressBuffered');
     const progressHandle = document.getElementById('progressHandle');
     const currentTimeEl = document.getElementById('currentTime');
     const totalTimeEl = document.getElementById('totalTime');
     const qualityDropdown = document.getElementById('qualityDropdown');
+    const qualityTracker = document.getElementById('qualityTracker');
+    const playerCloseBtn = document.getElementById('playerCloseBtn');
+    const manualRetryBtn = document.getElementById('manualRetryBtn');
 
     if (!wrapper || !video) return;
 
@@ -46,148 +48,160 @@
     let adPlaying = false;
 
     // ============================================
-    // Title Injection
+    // Helper Functions
     // ============================================
-    (function() {
-        const titleContainer = document.getElementById('dynamicTitleContainer');
-        if (titleContainer && CHANNEL_DATA && CHANNEL_DATA.id) {
-            const matchTitleKey = 'current_match_title_' + CHANNEL_DATA.id;
-            const matchTitle = sessionStorage.getItem(matchTitleKey);
-            
-            if (matchTitle && matchTitle.includes(' ضد ')) {
-                const parts = matchTitle.split(' ضد ');
-                titleContainer.innerHTML = `
-                <div class="player-match-title">
-                    <span class="match-live-badge">مباشر</span>
-                    <span class="match-team">${parts[0]}</span>
-                    <span class="match-vs">ضد</span>
-                    <span class="match-team">${parts[1]}</span>
-                </div>
-                `;
-            }
-            // Clear it so it doesn't stick permanently if the user accessed from somewhere else later
-            sessionStorage.removeItem(matchTitleKey);
-        }
-    })();
-
-    // ============================================
-    // Initialize Player
-    // ============================================
-    function initPlayer() {
-        const streamUrl = CHANNEL_DATA.streamUrl;
-        const streamType = CHANNEL_DATA.type || 'hls';
-
-        showLoading(true);
-        showError(false);
-
-        if (streamType === 'embed') {
-            initEmbed(streamUrl);
-        } else if (streamType === 'dash' || streamUrl.includes('.mpd')) {
-            initDash(streamUrl);
+    function showLoading(show) { if (loading) loading.style.display = show ? 'flex' : 'none'; }
+    function showError(show, message) {
+        if (errorOverlay) errorOverlay.style.display = show ? 'flex' : 'none';
+        if (errorText && message) errorText.textContent = message;
+        if (show) showLoading(false);
+    }
+    function formatTime(seconds) {
+        seconds = Math.abs(Math.round(seconds));
+        const h = Math.floor(seconds / 3600);
+        const m = Math.floor((seconds % 3600) / 60);
+        const s = seconds % 60;
+        if (h > 0) return h + ':' + String(m).padStart(2, '0') + ':' + String(s).padStart(2, '0');
+        return m + ':' + String(s).padStart(2, '0');
+    }
+    function updatePlayPauseIcon() { if (btnPlayPause) btnPlayPause.innerHTML = `<span class="material-icons-round">${video.paused ? 'play_arrow' : 'pause'}</span>`; }
+    function updateMuteUI() {
+        if (!btnMute) return;
+        if (video.muted || video.volume === 0) btnMute.innerHTML = '<span class="material-icons-round">volume_off</span>';
+        else if (video.volume < 0.5) btnMute.innerHTML = '<span class="material-icons-round">volume_down</span>';
+        else btnMute.innerHTML = '<span class="material-icons-round">volume_up</span>';
+        if (volumeSlider) volumeSlider.value = video.muted ? 0 : video.volume;
+    }
+    function toggleFullscreen() {
+        if (!document.fullscreenElement && !document.webkitFullscreenElement) {
+            if (wrapper.requestFullscreen) wrapper.requestFullscreen();
+            else if (wrapper.webkitRequestFullscreen) wrapper.webkitRequestFullscreen();
+            else if (video.webkitEnterFullscreen) video.webkitEnterFullscreen();
         } else {
-            initHLS(streamUrl);
+            if (document.exitFullscreen) document.exitFullscreen();
+            else if (document.webkitExitFullscreen) document.webkitExitFullscreen();
         }
+    }
+    function seekToLive() {
+        if (video.seekable && video.seekable.length > 0) {
+            video.currentTime = Math.max(video.seekable.end(0) - 2, video.seekable.start(0));
+            isAtLiveEdge = true;
+        }
+    }
+    function playVideo() {
+        const promise = video.play();
+        if (promise) promise.catch(() => { video.muted = true; video.play().catch(()=>{}); });
+    }
+    function togglePlay() {
+        if (adPlaying) return;
+        if (video.paused) { playVideo(); wrapper.classList.remove('paused'); }
+        else { video.pause(); wrapper.classList.add('paused'); }
     }
 
     // ============================================
-    // Embed Player (Iframe)
+    // DVR / TimeShift
     // ============================================
-    function initEmbed(url) {
-        showLoading(false);
-        const iframe = document.createElement('iframe');
-        iframe.src = url;
-        iframe.style.width = '100%';
-        iframe.style.height = '100%';
-        iframe.style.border = 'none';
-        iframe.style.position = 'absolute';
-        iframe.style.top = '0';
-        iframe.style.left = '0';
-        iframe.style.zIndex = '5';
-        iframe.allowFullscreen = true;
-        iframe.allow = "autoplay; fullscreen; encrypted-media; picture-in-picture";
-        
-        video.style.display = 'none';
-        
-        // Hide our custom video controls since we cannot control cross-origin iframes
-        if (controls) controls.style.display = 'none';
-        
-        // Keep our watermark and allow clicks to pass through to iframe
-        const watermark = document.getElementById('watermark');
-        if (watermark) {
-            watermark.style.zIndex = '10';
-            watermark.style.pointerEvents = 'none';
+    function updateDVRProgress() {
+        if (!isDVR || !video.seekable || video.seekable.length === 0) return;
+        const start = video.seekable.start(0);
+        const end = video.seekable.end(0);
+        const duration = end - start;
+        const currentPos = video.currentTime - start;
+        const percent = (currentPos / duration) * 100;
+        if (progressPlayed) progressPlayed.style.width = Math.min(percent, 100) + '%';
+        if (progressHandle) progressHandle.style.left = Math.min(percent, 100) + '%';
+        isAtLiveEdge = (end - video.currentTime) < 5;
+        if (btnLive) {
+            if (isAtLiveEdge) { btnLive.classList.add('is-live'); btnLive.innerHTML = 'مباشر'; }
+            else { btnLive.classList.remove('is-live'); btnLive.innerHTML = 'العودة إلى المباشر'; }
         }
-        
-        const bannerAd = document.getElementById('playerBannerAd');
-        if (bannerAd) bannerAd.style.zIndex = '15';
-        
-        wrapper.insertBefore(iframe, video);
+        if (currentTimeEl) currentTimeEl.textContent = formatTime(currentPos);
+        if (totalTimeEl) totalTimeEl.textContent = formatTime(duration);
+    }
+
+    function updateBuffered() {
+        if (!progressBuffered || !video.buffered || video.buffered.length === 0) return;
+        if (!isDVR || !video.seekable || video.seekable.length === 0) return;
+        const start = video.seekable.start(0);
+        const end = video.seekable.end(0);
+        const duration = end - start;
+        const buffEnd = video.buffered.end(video.buffered.length - 1);
+        const percent = ((buffEnd - start) / duration) * 100;
+        progressBuffered.style.width = Math.min(percent, 100) + '%';
+    }
+
+    function checkDVRSupport() {
+        video.addEventListener('timeupdate', function() {
+            if (video.seekable && video.seekable.length > 0) {
+                const start = video.seekable.start(0);
+                const end = video.seekable.end(0);
+                const duration = end - start;
+                if (duration > 15) {
+                    if (!isDVR) {
+                        isDVR = true;
+                        if (btnLive) btnLive.style.display = 'inline-flex';
+                    }
+                    updateDVRProgress();
+                } else {
+                    if (isDVR) {
+                        isDVR = false;
+                        if (btnLive) btnLive.style.display = 'none';
+                    }
+                }
+            }
+        });
+    }
+
+    // ============================================
+    // Quality Levels
+    // ============================================
+    function setupQualityLevels(levels) {
+        if (!qualityDropdown || !levels || levels.length <= 1) return;
+        let html = '<button class="quality-option active" data-level="-1">تلقائي</button>';
+        levels.forEach((level, idx) => {
+            let label = level.height ? (level.height >= 1080 ? 'عالية (1080p)' : (level.height >= 720 ? 'متوسطة (720p)' : `منخفضة (${level.height}p)`)) : `جودة ${idx+1}`;
+            html += `<button class="quality-option" data-level="${idx}">${label}</button>`;
+        });
+        qualityDropdown.innerHTML = html;
+        qualityDropdown.querySelectorAll('.quality-option').forEach(btn => {
+            btn.addEventListener('click', function() {
+                const level = parseInt(this.dataset.level);
+                if (hlsPlayer) hlsPlayer.currentLevel = level;
+                if (qualityTracker) qualityTracker.textContent = this.textContent.split(' ')[0];
+                qualityDropdown.querySelectorAll('.quality-option').forEach(o => o.classList.remove('active'));
+                this.classList.add('active');
+                qualityDropdown.style.display = 'none';
+            });
+        });
     }
 
     // ============================================
     // HLS.js Player
     // ============================================
     function initHLS(url) {
-        if (hlsPlayer) {
-            hlsPlayer.destroy();
-            hlsPlayer = null;
-        }
-
+        if (hlsPlayer) { hlsPlayer.destroy(); hlsPlayer = null; }
         if (Hls.isSupported()) {
             hlsPlayer = new Hls({
                 maxBufferLength: 60,
-                maxMaxBufferLength: 600,
-                backBufferLength: 90,
-                liveSyncDurationCount: 2, // ~2 target segments behind live edge
-                liveMaxLatencyDurationCount: 5,
-                liveDurationInfinity: true,
+                liveSyncDurationCount: 2,
                 enableWorker: true,
-                lowLatencyMode: true,
-                xhrSetup: function(xhr) {
-                    xhr.withCredentials = false;
-                }
+                xhrSetup: (xhr) => { xhr.withCredentials = false; }
             });
-
             hlsPlayer.loadSource(url);
             hlsPlayer.attachMedia(video);
-
-            hlsPlayer.on(Hls.Events.MANIFEST_PARSED, function(event, data) {
+            hlsPlayer.on(Hls.Events.MANIFEST_PARSED, (event, data) => {
                 showLoading(false);
                 playVideo();
                 setupQualityLevels(data.levels);
                 checkDVRSupport();
             });
-
-            hlsPlayer.on(Hls.Events.ERROR, function(event, data) {
-                if (data.fatal) {
-                    switch (data.type) {
-                        case Hls.ErrorTypes.NETWORK_ERROR:
-                            console.error('HLS Network Error:', data);
-                            hlsPlayer.startLoad();
-                            break;
-                        case Hls.ErrorTypes.MEDIA_ERROR:
-                            console.error('HLS Media Error:', data);
-                            hlsPlayer.recoverMediaError();
-                            break;
-                        default:
-                            showError(true, 'حدث خطأ في تحميل البث');
-                            break;
-                    }
-                }
+            hlsPlayer.on(Hls.Events.ERROR, (event, data) => {
+                if (data.fatal) showError(true, 'حدث خطأ في تحميل البث');
             });
-
-            hlsPlayer.on(Hls.Events.LEVEL_SWITCHED, function(event, data) {
-                updateQualityUI(data.level);
-            });
-
-            hlsPlayer.on(Hls.Events.FRAG_BUFFERED, function() {
-                updateBuffered();
-            });
-
+            hlsPlayer.on(Hls.Events.FRAG_BUFFERED, () => updateBuffered());
         } else if (video.canPlayType('application/vnd.apple.mpegurl')) {
-            // Safari native HLS
             video.src = url;
-            video.addEventListener('loadedmetadata', function() {
+            video.addEventListener('loadedmetadata', () => {
                 showLoading(false);
                 playVideo();
                 checkDVRSupport();
@@ -198,613 +212,108 @@
     }
 
     // ============================================
-    // DASH.js Player
+    // Main Initializer
     // ============================================
-    function initDash(url) {
-        if (dashPlayer) {
-            dashPlayer.reset();
-            dashPlayer = null;
-        }
+    window.initPlayerFromGlobal = function() {
+        if (!window.CHANNEL_DATA) return;
+        const streamUrl = window.CHANNEL_DATA.streamUrl;
+        showLoading(true);
+        showError(false);
+        if (hlsPlayer) { hlsPlayer.destroy(); hlsPlayer = null; }
+        video.pause();
+        video.removeAttribute('src');
+        video.load();
+        isDVR = false;
+        if (btnLive) btnLive.style.display = 'none';
+        initHLS(streamUrl);
+    };
 
-        if (typeof dashjs !== 'undefined') {
-            dashPlayer = dashjs.MediaPlayer().create();
-            dashPlayer.initialize(video, url, false);
-
-            dashPlayer.updateSettings({
-                streaming: {
-                    lowLatencyEnabled: false,
-                    buffer: {
-                        fastSwitchEnabled: true
-                    }
-                }
-            });
-
-            dashPlayer.on(dashjs.MediaPlayer.events.STREAM_INITIALIZED, function() {
-                showLoading(false);
-                playVideo();
-                setupDashQualities();
-                checkDVRSupport();
-            });
-
-            dashPlayer.on(dashjs.MediaPlayer.events.ERROR, function(e) {
-                console.error('DASH Error:', e);
-                showError(true, 'حدث خطأ في تحميل البث');
-            });
-        } else {
-            showError(true, 'مكتبة DASH غير محملة');
-        }
+    // ============================================
+    // Event Listeners
+    // ============================================
+    if (btnPlayPause) btnPlayPause.addEventListener('click', togglePlay);
+    if (btnMute) btnMute.addEventListener('click', () => { video.muted = !video.muted; updateMuteUI(); });
+    if (volumeSlider) volumeSlider.addEventListener('input', function() { video.volume = parseFloat(this.value); video.muted = (this.value == 0); updateMuteUI(); });
+    if (btnFullscreen) btnFullscreen.addEventListener('click', toggleFullscreen);
+    if (btnLive) btnLive.addEventListener('click', seekToLive);
+    if (btnQuality && qualityDropdown) {
+        btnQuality.addEventListener('click', (e) => { e.stopPropagation(); qualityDropdown.style.display = qualityDropdown.style.display === 'none' ? 'block' : 'none'; });
+        document.addEventListener('click', () => { if (qualityDropdown) qualityDropdown.style.display = 'none'; });
     }
-
-    // ============================================
-    // Quality Levels
-    // ============================================
-    function setupQualityLevels(levels) {
-        if (!qualityDropdown || !levels || levels.length <= 1) return;
-
-        let html = '<button class="quality-option active" data-level="-1">تلقائي</button>';
-        
-        levels.forEach(function(level, index) {
-            const height = level.height || '?';
-            const bitrate = Math.round((level.bitrate || 0) / 1000);
-            let label = height + 'p';
-            if (height >= 1080) label = 'عالية (1080p)';
-            else if (height >= 720) label = 'متوسطة (720p)';
-            else if (height >= 480) label = 'منخفضة (480p)';
-            
-            html += '<button class="quality-option" data-level="' + index + '">' + label + '</button>';
-        });
-
-        qualityDropdown.innerHTML = html;
-
-        qualityDropdown.querySelectorAll('.quality-option').forEach(function(btn) {
-            btn.addEventListener('click', function() {
-                const level = parseInt(this.dataset.level);
-                if (hlsPlayer) {
-                    hlsPlayer.currentLevel = level;
-                }
-                qualityDropdown.querySelectorAll('.quality-option').forEach(function(o) { o.classList.remove('active'); });
-                const qualityTracker = document.getElementById('qualityTracker');
-                if (qualityTracker) qualityTracker.textContent = this.textContent.split(' ')[0];
-                this.classList.add('active');
-                qualityDropdown.style.display = 'none';
-            });
-        });
-    }
-
-    function setupDashQualities() {
-        if (!dashPlayer || !qualityDropdown) return;
-        const qualities = dashPlayer.getBitrateInfoListFor('video');
-        if (!qualities || qualities.length <= 1) return;
-
-        let html = '<button class="quality-option active" data-level="-1">تلقائي</button>';
-        
-        qualities.forEach(function(q, i) {
-            const label = (q.height || '?') + 'p';
-            html += '<button class="quality-option" data-level="' + i + '">' + label + '</button>';
-        });
-
-        qualityDropdown.innerHTML = html;
-
-        qualityDropdown.querySelectorAll('.quality-option').forEach(function(btn) {
-            btn.addEventListener('click', function() {
-                const level = parseInt(this.dataset.level);
-                if (level === -1) {
-                    dashPlayer.updateSettings({ streaming: { abr: { autoSwitchBitrate: { video: true } } } });
-                } else {
-                    dashPlayer.updateSettings({ streaming: { abr: { autoSwitchBitrate: { video: false } } } });
-                    dashPlayer.setQualityFor('video', level);
-                }
-                qualityDropdown.querySelectorAll('.quality-option').forEach(function(o) { o.classList.remove('active'); });
-                const qualityTracker = document.getElementById('qualityTracker');
-                if (qualityTracker) qualityTracker.textContent = this.textContent;
-                this.classList.add('active');
-                qualityDropdown.style.display = 'none';
-            });
-        });
-    }
-
-    function updateQualityUI(level) {
-        if (!qualityDropdown) return;
-        // Auto mode active - no manual highlight needed
-    }
-
-    // ============================================
-    // DVR / TimeShift (Source-based only)
-    // ============================================
-    function checkDVRSupport() {
-        const progressRow = document.getElementById('progressRow');
-
-        // Use timeupdate for smooth progress bar updates and checking stream capabilities
-        video.addEventListener('timeupdate', function() {
-            if (video.seekable && video.seekable.length > 0) {
+    if (progressWrapper) {
+        progressWrapper.addEventListener('click', (e) => {
+            if (!video.duration && !isDVR) return;
+            const rect = progressWrapper.getBoundingClientRect();
+            let percent = (e.clientX - rect.left) / rect.width;
+            percent = Math.min(1, Math.max(0, percent));
+            if (isDVR && video.seekable && video.seekable.length) {
                 const start = video.seekable.start(0);
                 const end = video.seekable.end(0);
-                const duration = end - start;
-
-                if (duration > 15) {
-                    // Stream has enough buffer to be considered DVR
-                    if (!isDVR) {
-                        isDVR = true;
-                        if (btnLive) btnLive.style.display = 'inline-flex';
-                        if (progressRow) progressRow.style.display = 'flex';
-                    }
-                    updateDVRProgress();
-                } else {
-                    // Pure live, no seeking
-                    if (isDVR) {
-                        isDVR = false;
-                        if (progressRow) progressRow.style.display = 'none';
-                    }
-                }
-            }
-        });
-    }
-
-    function updateDVRProgress() {
-        if (!isDVR || !video.seekable || video.seekable.length === 0) return;
-
-        const start = video.seekable.start(0);
-        const end = video.seekable.end(0);
-        const duration = end - start;
-        const currentPos = video.currentTime - start;
-        const percent = (currentPos / duration) * 100;
-
-        if (progressPlayed) progressPlayed.style.width = Math.min(percent, 100) + '%';
-        if (progressHandle) {
-            progressHandle.style.left = Math.min(percent, 100) + '%';
-        }
-
-        // Check if at live edge (within 5 seconds tolerance)
-        const liveThreshold = 5;
-        isAtLiveEdge = (end - video.currentTime) < liveThreshold;
-
-        if (btnLive) {
-            if (isAtLiveEdge) {
-                btnLive.classList.add('is-live');
-                btnLive.innerHTML = 'مباشر';
+                video.currentTime = start + (percent * (end - start));
             } else {
-                btnLive.classList.remove('is-live');
-                btnLive.innerHTML = 'العودة الى البث المباشر';
+                video.currentTime = percent * video.duration;
             }
-        }
-
-        // Update time display
-        if (currentTimeEl) {
-            currentTimeEl.textContent = formatTime(currentPos);
-        }
-        if (totalTimeEl) {
-            totalTimeEl.textContent = formatTime(duration);
-        }
+        });
     }
-
-    function seekToLive() {
-        if (video.seekable && video.seekable.length > 0) {
-            // Give 2 seconds buffer from the absolute end to prevent instant stalling
-            video.currentTime = Math.max(video.seekable.end(0) - 2, video.seekable.start(0));
-            isAtLiveEdge = true;
-        }
-    }
-
-    // ============================================
-    // Progress Bar Interaction (DVR seeking)
-    // ============================================
-    if (progressWrapper) {
-        let isSeeking = false;
-
-        progressWrapper.addEventListener('mousedown', function(e) {
-            if (!isDVR) return;
-            isSeeking = true;
-            seekFromEvent(e);
-        });
-
-        document.addEventListener('mousemove', function(e) {
-            if (!isSeeking) return;
-            seekFromEvent(e);
-        });
-
-        document.addEventListener('mouseup', function() {
-            isSeeking = false;
-        });
-
-        // Touch support
-        progressWrapper.addEventListener('touchstart', function(e) {
-            if (!isDVR) return;
-            isSeeking = true;
-            seekFromEvent(e.touches[0]);
-        });
-
-        document.addEventListener('touchmove', function(e) {
-            if (!isSeeking) return;
-            seekFromEvent(e.touches[0]);
-        });
-
-        document.addEventListener('touchend', function() {
-            isSeeking = false;
-        });
-
-        function seekFromEvent(e) {
-            if (!video.seekable || video.seekable.length === 0) return;
-
-            const rect = progressBar.getBoundingClientRect();
-            // LTR Progress bar calculation
-            const percent = (e.clientX - rect.left) / rect.width;
-            const clampedPercent = Math.max(0, Math.min(1, percent));
-
-            const start = video.seekable.start(0);
-            const end = video.seekable.end(0);
-            const duration = end - start;
-            const seekTime = start + (clampedPercent * duration);
-
-            video.currentTime = seekTime;
-        }
-    }
-
-    // ============================================
-    // Buffered Progress
-    // ============================================
-    function updateBuffered() {
-        if (!progressBuffered || !video.buffered || video.buffered.length === 0) return;
-        if (!isDVR || !video.seekable || video.seekable.length === 0) return;
-
-        const start = video.seekable.start(0);
-        const end = video.seekable.end(0);
-        const duration = end - start;
-
-        const buffEnd = video.buffered.end(video.buffered.length - 1);
-        const percent = ((buffEnd - start) / duration) * 100;
-        progressBuffered.style.width = Math.min(percent, 100) + '%';
-    }
-
-    // ============================================
-    // Controls: Play/Pause
-    // ============================================
-    if (btnPlayPause) {
-        btnPlayPause.addEventListener('click', togglePlay);
-    }
-
-    // Skip buttons removed per user request
-
-    wrapper.addEventListener('click', function(e) {
-        // Prevent click if clicking on buttons or interactive areas
-        if (e.target.closest('.player-btn') || e.target.closest('.skip-btn') || e.target.closest('.quality-pill') || e.target.closest('.quality-dropdown') || e.target.closest('.volume-wrapper') || e.target.closest('.player-progress-wrapper') || e.target.closest('.player-live-btn') || e.target.closest('.player-top-bar') || e.target.closest('.player-actions-row')) return;
-        if (e.target === video || e.target === wrapper || e.target.closest('.player-center-icon')) {
-            togglePlay();
-        }
-    });
-
-    // Double click for fullscreen
-    wrapper.addEventListener('dblclick', function(e) {
-        if (e.target === video || e.target === wrapper) {
-            toggleFullscreen();
-        }
-    });
-
-    function togglePlay() {
-        if (adPlaying) return;
-        if (video.paused) {
-            playVideo();
-            wrapper.classList.remove('paused');
-        } else {
+    if (playerCloseBtn) {
+        playerCloseBtn.addEventListener('click', () => {
+            document.getElementById('playerOverlay').classList.remove('active');
+            if (hlsPlayer) hlsPlayer.destroy();
+            hlsPlayer = null;
             video.pause();
-            wrapper.classList.add('paused');
-        }
+            video.src = '';
+        });
     }
+    if (manualRetryBtn) manualRetryBtn.addEventListener('click', () => { if (window.CHANNEL_DATA) window.initPlayerFromGlobal(); });
 
-    function playVideo() {
-        const promise = video.play();
-        if (promise) {
-            promise.catch(function(err) {
-                // Autoplay blocked, wait for user interaction
-                console.log('Autoplay prevented:', err);
-                video.muted = true;
-                const mutedPromise = video.play();
-                if (mutedPromise) {
-                    mutedPromise.then(() => {
-                        updateMuteUI();
-                        wrapper.classList.remove('paused');
-                    }).catch((e) => {
-                        console.log('Muted autoplay also prevented', e);
-                        wrapper.classList.add('paused');
-                    });
-                }
-            });
+    // Video events
+    video.addEventListener('play', () => { updatePlayPauseIcon(); wrapper.classList.remove('paused'); });
+    video.addEventListener('pause', () => { updatePlayPauseIcon(); wrapper.classList.add('paused'); showControls(); });
+    video.addEventListener('waiting', () => showLoading(true));
+    video.addEventListener('playing', () => { showLoading(false); showError(false); });
+    video.addEventListener('canplay', () => showLoading(false));
+    video.addEventListener('volumechange', updateMuteUI);
+    video.addEventListener('timeupdate', () => {
+        if (isDVR) updateDVRProgress();
+        else if (video.duration) {
+            let percent = (video.currentTime / video.duration) * 100;
+            if (progressPlayed) progressPlayed.style.width = percent + '%';
+            if (progressHandle) progressHandle.style.left = percent + '%';
+            if (currentTimeEl) currentTimeEl.textContent = formatTime(video.currentTime);
+            if (totalTimeEl) totalTimeEl.textContent = formatTime(video.duration);
         }
-    }
-
-    video.addEventListener('play', function() {
-        if (btnPlayPause) btnPlayPause.innerHTML = '<i class="ph-fill ph-pause"></i>';
-        wrapper.classList.remove('paused');
-        wrapper.classList.add('playing');
     });
 
-    video.addEventListener('pause', function() {
-        if (btnPlayPause) btnPlayPause.innerHTML = '<i class="ph-fill ph-play"></i>';
-        wrapper.classList.add('paused');
-        wrapper.classList.remove('playing');
-        showControls();
-    });
-
-    video.addEventListener('waiting', function() {
-        showLoading(true);
-    });
-
-    video.addEventListener('playing', function() {
-        showLoading(false);
-        showError(false);
-    });
-
-    video.addEventListener('canplay', function() {
-        showLoading(false);
-    });
-
-    // ============================================
-    // Controls: Volume
-    // ============================================
-    if (btnMute) {
-        btnMute.addEventListener('click', function() {
-            video.muted = !video.muted;
-            updateMuteUI();
-        });
-    }
-
-    if (volumeSlider) {
-        volumeSlider.addEventListener('input', function() {
-            video.volume = this.value;
-            video.muted = this.value == 0;
-            updateMuteUI();
-        });
-    }
-
-    function updateMuteUI() {
-        if (!btnMute) return;
-        if (video.muted || video.volume === 0) {
-            btnMute.innerHTML = '<i class="ph ph-speaker-slash"></i>';
-        } else if (video.volume < 0.5) {
-            btnMute.innerHTML = '<i class="ph ph-speaker-low"></i>';
-        } else {
-            btnMute.innerHTML = '<i class="ph ph-speaker-high"></i>';
-        }
-        if (volumeSlider) {
-            volumeSlider.value = video.muted ? 0 : video.volume;
-        }
-    }
-
-    // ============================================
-    // Controls: Fullscreen
-    // ============================================
-    if (btnFullscreen) {
-        btnFullscreen.addEventListener('click', toggleFullscreen);
-    }
-
-    function toggleFullscreen() {
-        if (!document.fullscreenElement && !document.webkitFullscreenElement) {
-            if (wrapper.requestFullscreen) {
-                wrapper.requestFullscreen();
-            } else if (wrapper.webkitRequestFullscreen) {
-                wrapper.webkitRequestFullscreen();
-            } else if (wrapper.msRequestFullscreen) {
-                wrapper.msRequestFullscreen();
-            } else if (video.webkitEnterFullscreen) {
-                video.webkitEnterFullscreen(); // iOS
-            }
-        } else {
-            if (document.exitFullscreen) {
-                document.exitFullscreen();
-            } else if (document.webkitExitFullscreen) {
-                document.webkitExitFullscreen();
-            }
-        }
-    }
-
-    document.addEventListener('fullscreenchange', updateFullscreenUI);
-    document.addEventListener('webkitfullscreenchange', updateFullscreenUI);
-
-    function updateFullscreenUI() {
-        const isFS = document.fullscreenElement || document.webkitFullscreenElement;
-        if (btnFullscreen) {
-            btnFullscreen.innerHTML = isFS ? '<i class="ph ph-corners-in"></i>' : '<i class="ph ph-corners-out"></i>';
-        }
-    }
-
-    // ============================================
-    // Controls: Live Button
-    // ============================================
-    if (btnLive) {
-        btnLive.addEventListener('click', function() {
-            seekToLive();
-        });
-    }
-
-
-
-    // ============================================
-    // Controls: Quality Menu
-    // ============================================
-    if (btnQuality && qualityDropdown) {
-        btnQuality.addEventListener('click', function(e) {
-            e.stopPropagation();
-            qualityDropdown.style.display = qualityDropdown.style.display === 'none' ? 'block' : 'none';
-        });
-
-        document.addEventListener('click', function() {
-            qualityDropdown.style.display = 'none';
-        });
-    }
-
-    // ============================================
-    // Controls: LIVE Button
-    // ============================================
-    if (btnLive) {
-        btnLive.addEventListener('click', function() {
-            seekToLive();
-        });
-    }
-
-    // ============================================
-    // Controls: Auto-hide
-    // ============================================
+    // Auto-hide controls
     function showControls() {
         wrapper.classList.remove('autohide');
-        wrapper.style.cursor = 'default';
         clearTimeout(controlsTimeout);
-        if (!video.paused) {
-            controlsTimeout = setTimeout(hideControls, 3000);
-        }
+        if (!video.paused) controlsTimeout = setTimeout(() => wrapper.classList.add('autohide'), 3000);
     }
-
-    function hideControls() {
-        if (video.paused) return;
-        wrapper.classList.add('autohide');
-        wrapper.style.cursor = 'none';
-    }
-
+    function hideControls() { if (video.paused) return; wrapper.classList.add('autohide'); }
     wrapper.addEventListener('mousemove', showControls);
     wrapper.addEventListener('touchstart', showControls);
-    wrapper.addEventListener('mouseleave', function() {
-        if (!video.paused) {
-            controlsTimeout = setTimeout(hideControls, 1000);
-        }
-    });
-    
-    // Initial state
-    wrapper.classList.add('paused');
+    wrapper.addEventListener('mouseleave', () => { if (!video.paused) controlsTimeout = setTimeout(hideControls, 1000); });
+    wrapper.addEventListener('click', (e) => { if (e.target === video || e.target === wrapper) togglePlay(); });
+    wrapper.addEventListener('dblclick', (e) => { if (e.target === video || e.target === wrapper) toggleFullscreen(); });
     showControls();
 
-
-    // ============================================
-    // Keyboard Shortcuts
-    // ============================================
-    document.addEventListener('keydown', function(e) {
-        // Don't trigger if typing in an input
+    // Keyboard shortcuts
+    document.addEventListener('keydown', (e) => {
         if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') return;
-
         switch (e.key.toLowerCase()) {
-            case ' ':
-            case 'k':
-                e.preventDefault();
-                togglePlay();
-                break;
-            case 'f':
-                e.preventDefault();
-                toggleFullscreen();
-                break;
-            case 'm':
-                e.preventDefault();
-                video.muted = !video.muted;
-                updateMuteUI();
-                break;
-            case 'arrowup':
-                e.preventDefault();
-                video.volume = Math.min(1, video.volume + 0.1);
-                video.muted = false;
-                updateMuteUI();
-                break;
-            case 'arrowdown':
-                e.preventDefault();
-                video.volume = Math.max(0, video.volume - 0.1);
-                updateMuteUI();
-                break;
-            case 'l':
-                e.preventDefault();
-                seekToLive();
-                break;
-            case 'escape':
-                if (document.fullscreenElement) {
-                    document.exitFullscreen();
-                }
-                break;
+            case ' ': case 'k': e.preventDefault(); togglePlay(); break;
+            case 'f': e.preventDefault(); toggleFullscreen(); break;
+            case 'm': e.preventDefault(); video.muted = !video.muted; updateMuteUI(); break;
+            case 'arrowup': e.preventDefault(); video.volume = Math.min(1, video.volume + 0.1); video.muted = false; updateMuteUI(); break;
+            case 'arrowdown': e.preventDefault(); video.volume = Math.max(0, video.volume - 0.1); updateMuteUI(); break;
+            case 'l': e.preventDefault(); seekToLive(); break;
+            case 'escape': if (document.fullscreenElement) document.exitFullscreen(); break;
         }
     });
 
-    // ============================================
-    // Helpers
-    // ============================================
-    function showLoading(show) {
-        if (loading) loading.style.display = show ? 'flex' : 'none';
+    // If CHANNEL_DATA is already set and overlay active (on page load if needed)
+    if (window.CHANNEL_DATA && document.getElementById('playerOverlay').classList.contains('active')) {
+        window.initPlayerFromGlobal();
     }
-
-    function showError(show, message) {
-        if (errorOverlay) errorOverlay.style.display = show ? 'flex' : 'none';
-        if (errorText && message) errorText.textContent = message;
-        if (show) showLoading(false);
-    }
-
-    function formatTime(seconds) {
-        seconds = Math.abs(Math.round(seconds));
-        const h = Math.floor(seconds / 3600);
-        const m = Math.floor((seconds % 3600) / 60);
-        const s = seconds % 60;
-        if (h > 0) return h + ':' + String(m).padStart(2, '0') + ':' + String(s).padStart(2, '0');
-        return m + ':' + String(s).padStart(2, '0');
-    }
-
-    // ============================================
-    // Retry
-    // ============================================
-    window.retryStream = function() {
-        initPlayer();
-    };
-
-    // ============================================
-    // Pre-roll Ad System
-    // ============================================
-    function handlePrerollAd() {
-        const adOverlay = document.getElementById('adOverlay');
-        const adVideo = document.getElementById('adVideo');
-        const adSkip = document.getElementById('adSkip');
-        const adTimer = document.getElementById('adTimer');
-
-        if (!adOverlay || !adVideo || !ADS_CONFIG || !ADS_CONFIG.preroll || !ADS_CONFIG.preroll.enabled) {
-            // No ad, init player directly
-            initPlayer();
-            return;
-        }
-
-        adPlaying = true;
-        const skipAfter = ADS_CONFIG.preroll.skip_after || 5;
-
-        adVideo.play().catch(function() {
-            // Autoplay blocked, skip ad
-            adOverlay.style.display = 'none';
-            adPlaying = false;
-            initPlayer();
-        });
-
-        adVideo.addEventListener('playing', function() {
-            if (adTimer) {
-                adTimer.classList.add('is-playing');
-            }
-        });
-
-        adVideo.addEventListener('timeupdate', function() {
-            if (isNaN(adVideo.duration)) return;
-            const remaining = Math.ceil(adVideo.duration - adVideo.currentTime);
-            if (adTimer) adTimer.textContent = remaining + ' ثانية';
-
-            if (adVideo.currentTime >= skipAfter && adSkip) {
-                adSkip.style.display = 'inline-flex';
-            }
-        });
-
-        adVideo.addEventListener('ended', function() {
-            adOverlay.style.display = 'none';
-            adPlaying = false;
-            initPlayer();
-        });
-    }
-
-    window.skipAd = function() {
-        const adOverlay = document.getElementById('adOverlay');
-        const adVideo = document.getElementById('adVideo');
-        if (adVideo) adVideo.pause();
-        if (adOverlay) adOverlay.style.display = 'none';
-        adPlaying = false;
-        initPlayer();
-    };
-
-    // ============================================
-    // Start
-    // ============================================
-    handlePrerollAd();
-
 })();
