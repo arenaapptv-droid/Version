@@ -190,12 +190,16 @@
             if (!currentChannel || !currentChannel.servers[serverIndex] || !jwPlayer) return;
             const server = currentChannel.servers[serverIndex];
             loadingSpinner.classList.add('show');
-            jwPlayer.setup({
+            
+            // استخدام load لتغيير المصدر بسلاسة دون إعادة تهيئة المشغل
+            jwPlayer.load({
                 file: server.url,
                 type: 'hls',
-                width: '100%', height: '100%',
-                autostart: true, mute: jwPlayer.getMute(), volume: jwPlayer.getVolume(),
-                stretching: 'uniform', controls: false,
+                autostart: true,
+                mute: jwPlayer.getMute(),
+                volume: jwPlayer.getVolume(),
+                stretching: 'uniform',
+                controls: false,
                 playbackRateControls: true,
                 playbackRates: [0.5, 1, 1.25, 1.5, 2],
                 hlsjs: {},
@@ -206,9 +210,16 @@
                     }
                 }
             });
-            jwPlayer.on('play', () => loadingSpinner.classList.remove('show'));
-            jwPlayer.on('ready', () => loadingSpinner.classList.remove('show'));
-            jwPlayer.on('error', () => { loadingSpinner.classList.remove('show'); showToast('خطأ في تغيير الجودة', 'error'); });
+            
+            // إخفاء مؤشر التحميل عند الجاهزية أو الخطأ
+            const onReadyOrError = () => loadingSpinner.classList.remove('show');
+            jwPlayer.on('ready', onReadyOrError);
+            jwPlayer.on('play', onReadyOrError);
+            jwPlayer.on('error', () => {
+                onReadyOrError();
+                showToast('خطأ في تغيير الجودة', 'error');
+            });
+            
             buildQualityPopup();
         }
 
